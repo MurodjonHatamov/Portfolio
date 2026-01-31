@@ -79,14 +79,14 @@ function Home() {
               data-aos-delay="120"
               className="relative flex justify-center items-center"
             >
-              <div className="relative w-72 h-72  sm:w-60 sm:h-60 flex items-center justify-center">
+              <div className="relative w-50 h-50  sm:w-80 sm:h-80 flex items-center justify-center">
                 {/* Glow */}
                 <div className="absolute -inset-6 rounded-full blur-3xl opacity-30 bg-[#1985A1] hidden dark:block" />
 
                 {/* Avatar body */}
                 <div className="relative w-full h-full rounded-full bg-[#C5C3C6] dark:bg-[#46494C] border border-[#4C5C68]/30 dark:border-[#C5C3C6]/20 flex items-center justify-center backdrop-blur">
                   <div className="w-[90%] h-[90%] rounded-full bg-[#DCDCDD] dark:bg-[#4C5C68]/60 flex items-center justify-center">
-                    <span className="text-[180px] sm:text-[200px] font-bold leading-none text-[#46494C] dark:text-[#DCDCDD] select-none">
+                    <span className="text-[140px] sm:text-[200px] font-bold leading-none text-[#46494C] dark:text-[#DCDCDD] select-none">
                       M
                     </span>
                   </div>

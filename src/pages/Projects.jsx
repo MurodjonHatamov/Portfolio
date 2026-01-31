@@ -84,86 +84,33 @@ function Projects() {
   return (
     <section
       id="projects"
-      className="min-h-screen py-20 relative overflow-hidden bg-gray-50 dark:bg-[#2d2e32]"
+      className="min-h-screen py-20 relative overflow-hidden  "
     >
-      {/* Orqa fon effektlari */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#1985A1]/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#4C5C68]/20 rounded-full blur-[120px]" />
-      </div>
+  
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
         <div
-          className="text-center mb-10 max-w-2xl mx-auto"
+          className=" mb-10  flex items-center justify-between mt-16 px-10"
           data-aos="fade-down"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-[#46494C] dark:text-[#DCDCDD] mb-4">
             My <span className="text-[#1985A1]">Projects</span>
           </h2>
-
-        </div>
-
-        {/* PREMIUM FILTER (minimal + wow) */}
-        <div
-          data-aos="fade-up"
-          className="flex justify-center mb-14"
-        >
-          <div
-            className="relative w-full max-w-3xl
-                       rounded-2xl
-                       border border-black/10 dark:border-white/10
-                       bg-white/55 dark:bg-white/5
-                       backdrop-blur
-                       px-2 py-2"
+          <div className="flex justify-center " data-aos="fade-up">
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noreferrer"
+            className="px-8 py-3 rounded-full border border-[#1985A1] text-[#1985A1] font-semibold hover:bg-[#1985A1] hover:text-white transition-all duration-300"
           >
-            {/* scroll on mobile */}
-            <div className="flex gap-2 overflow-x-auto no-scrollbar px-1">
-              {categories.map((c) => {
-                const isActive = active === c;
-                return (
-                  <button
-                    key={c}
-                    onClick={() => setActive(c)}
-                    className={`relative shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300
-                      ${
-                        isActive
-                          ? "text-white"
-                          : "text-[#4C5C68] dark:text-white/70 hover:text-[#1985A1]"
-                      }`}
-                  >
-                    {/* Active bg (glass) */}
-                    {isActive && (
-                      <span className="absolute inset-0 rounded-xl bg-[#1985A1] shadow-lg shadow-[#1985A1]/25" />
-                    )}
-
-                    {/* Content */}
-                    <span className="relative z-10 flex items-center gap-2">
-                      {c}
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full border transition-all
-                          ${
-                            isActive
-                              ? "border-white/20 bg-white/15 text-white"
-                              : "border-black/10 dark:border-white/10 bg-white/40 dark:bg-white/5 text-[#4C5C68] dark:text-white/60"
-                          }`}
-                      >
-                        {countBy[c] || 0}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* subtle bottom line */}
-            <div className="mt-2 h-px w-full bg-black/5 dark:bg-white/5" />
-            <div className="pt-2 px-2 text-xs text-[#4C5C68]/70 dark:text-white/40">
-              Filter: <span className="text-[#1985A1] font-semibold">{active}</span>
-            </div>
-          </div>
+            View All Archives
+          </a>
+        </div>
         </div>
 
+    
+    
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {filtered.map((project, index) => (
@@ -240,23 +187,9 @@ function Projects() {
         </div>
 
         {/* More Projects Button */}
-        <div className="flex justify-center mt-16" data-aos="fade-up">
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noreferrer"
-            className="px-8 py-3 rounded-full border border-[#1985A1] text-[#1985A1] font-semibold hover:bg-[#1985A1] hover:text-white transition-all duration-300"
-          >
-            View All Archives
-          </a>
-        </div>
+
       </div>
 
-      {/* Hide scrollbar utility (pure tailwind) */}
-      <style>{`
-        .no-scrollbar::-webkit-scrollbar{display:none;}
-        .no-scrollbar{-ms-overflow-style:none; scrollbar-width:none;}
-      `}</style>
     </section>
   );
 }
