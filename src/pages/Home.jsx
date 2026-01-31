@@ -51,7 +51,7 @@ function Home() {
   return (
     <section
       id="home"
-      className="pb-[100px] lg:pb-[0]  min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-2 pb-16 relative overflow-hidden"
+      className="pb-[100px] lg:pb-[0]  min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-16 relative overflow-hidden"
     >
       {/* Background Accents */}
       <div className="absolute inset-0 -z-10 overflow-hidden hidden dark:flex">
