@@ -51,7 +51,7 @@ function Home() {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-2 pb-16 relative overflow-hidden"
+      className="pb-[100px] lg:pb-[0]  min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-2 pb-16 relative overflow-hidden"
     >
       {/* Background Accents */}
       <div className="absolute inset-0 -z-10 overflow-hidden hidden dark:flex">
@@ -79,7 +79,7 @@ function Home() {
               data-aos-delay="120"
               className="relative flex justify-center items-center"
             >
-              <div className="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center">
+              <div className="relative w-72 h-72  sm:w-60 sm:h-60 flex items-center justify-center">
                 {/* Glow */}
                 <div className="absolute -inset-6 rounded-full blur-3xl opacity-30 bg-[#1985A1] hidden dark:block" />
 

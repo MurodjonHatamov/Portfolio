@@ -27,8 +27,8 @@ function Navbar() {
 
 
   return (
-    <nav className="w-full px-6 bg-white/40 backdrop-blur-xl    
-                  dark:bg-gray-950">
+    <nav className="w-full px-6 bg-transparent   
+                  dark:bg-transparent">
       <div className="max-w-7xl m-auto flex items-center justify-between h-18 md:h-20">
 
         {/* Logo */}
@@ -38,7 +38,7 @@ function Navbar() {
         </div>
 
         {/* Menu */}
-        <ul className="hidden md:flex items-center gap-10 text-sm font-medium
+        <ul className=" md:flex items-center gap-10 text-sm font-medium
                        text-[#46494C] dark:text-[#DCDCDD]">
 
           {[
@@ -48,7 +48,7 @@ function Navbar() {
             { name: "Blog ", to: "/blog" },
             { name: "Contact", to: "/contact" },
           ].map((item) => (
-            <li key={item.name} className="relative group">
+            <li key={item.name} className="relative group max-lg:hidden">
               <NavLink
                 to={item.to}
                 className={({ isActive }) =>
