@@ -91,10 +91,10 @@ function Projects() {
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
         <div
-          className=" mb-10  flex items-center justify-between mt-16 px-10"
+          className=" mb-10  flex items-center justify-between mt-16 px-10 flex-wrap"
           data-aos="fade-down"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-[#46494C] dark:text-[#DCDCDD] mb-4">
+          <h2 className="text-4xl max-sm:text-[25px] md:text-5xl font-bold text-[#46494C] dark:text-[#DCDCDD] mb-4">
             My <span className="text-[#1985A1]">Projects</span>
           </h2>
           <div className="flex justify-center " data-aos="fade-up">
@@ -102,7 +102,7 @@ function Projects() {
             href="https://github.com"
             target="_blank"
             rel="noreferrer"
-            className="px-8 py-3 rounded-full border border-[#1985A1] text-[#1985A1] font-semibold hover:bg-[#1985A1] hover:text-white transition-all duration-300"
+            className="px-8 py-3 rounded-full border border-[#1985A1] text-[#1985A1] font-semibold max-sm:text-[12px] hover:bg-[#1985A1] hover:text-white transition-all duration-300"
           >
             View All Archives
           </a>
