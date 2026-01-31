@@ -44,7 +44,8 @@ function Navbar() {
           {[
             { name: "Home", to: "/" },
             { name: "Projects", to: "/projects" },
-            { name: "About", to: "/about" },
+            { name: "Experience ", to: "/experience" },
+            { name: "Blog ", to: "/blog" },
             { name: "Contact", to: "/contact" },
           ].map((item) => (
             <li key={item.name} className="relative group">
