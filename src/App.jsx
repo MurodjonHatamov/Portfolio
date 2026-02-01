@@ -8,8 +8,12 @@ import Sidebar from './components/Sidebar'
 import Experience from './pages/Experience'
 import Contact from './pages/Contact'
 import Blog from './pages/Blog'
+import { useEffect, useState } from 'react'
+import { getMainPage } from './api/mainPage'
 
 function App() {
+
+
 
 
   return (

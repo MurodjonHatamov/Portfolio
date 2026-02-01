@@ -4,15 +4,19 @@ import {
   FaLinkedinIn,
   FaInstagram,
   FaTelegramPlane,
+  FaEnvelope,
 } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
 import { RiMapPinLine } from "react-icons/ri";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { BASE_URL,   getCvBlob,  getMainPage } from "../api/mainPage";
 
 function Home() {
   const [currentRole, setCurrentRole] = useState(0);
-
+  const [profile, setProfile] = useState(null);
+  const [cvUrl, setCvUrl] = useState("");
+  const [loading, setLoading] = useState(true);
   const roles = [
     "Frontend Developer",
     "React Specialist",
@@ -21,15 +25,51 @@ function Home() {
     "Web Developer",
   ];
 
+
   const socials = [
-    { name: "GitHub", icon: FaGithub, href: "https://github.com" },
-    { name: "LinkedIn", icon: FaLinkedinIn, href: "https://linkedin.com" },
-    { name: "Instagram", icon: FaInstagram, href: "https://instagram.com" },
-    { name: "Telegram", icon: FaTelegramPlane, href: "https://t.me" },
+    { name: "GitHub", icon: FaGithub, href: `${profile?.github}` },
+    { name: "LinkedIn", icon: FaLinkedinIn, href: `${profile?.linkedin}` },
+    { name: "Telegram", icon: FaTelegramPlane, href: `${profile?.telegram}` },
   ];
 
   const frontendSkills = ["HTML", "CSS", "JavaScript", "React", "Tailwind"];
   const backendSkills = ["Node.js", "Express", "REST API", "MongoDB"];
+
+
+  useEffect(() => {
+    let urlToClean = "";
+  
+    (async () => {
+      try {
+        setLoading(true);
+  
+        const main = await getMainPage();
+        setProfile(main?.[0] || null);
+  
+        // ✅ CV pdf blob
+        const blob = await getCvBlob();
+  
+        // ✅ Blob -> URL
+        urlToClean = URL.createObjectURL(blob);
+        setCvUrl(urlToClean);
+        console.log("urlToClean:", urlToClean);
+        
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  
+    // ✅ cleanup (memory leak bo‘lmasin)
+    return () => {
+      if (urlToClean) URL.revokeObjectURL(urlToClean);
+    };
+  }, []);
+
+
+
+
 
   useEffect(() => {
     AOS.init({
@@ -53,6 +93,7 @@ function Home() {
       id="home"
       className="pb-[100px] lg:pb-[0]  min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-16 relative overflow-hidden"
     >
+      
       {/* Background Accents */}
       <div className="absolute inset-0 -z-10 overflow-hidden hidden dark:flex">
         <div
@@ -127,7 +168,8 @@ function Home() {
                 data-aos-delay="160"
                 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]"
               >
-                Hi, I&apos;m <span className="text-[#1985A1]">Murodjon</span>
+                Hi, I&apos;m <span className="text-[#1985A1]">{profile?.full_name}</span>
+                
               </h1>
 
               {/* Animated Role */}
@@ -144,6 +186,7 @@ function Home() {
                     <div key={index} className="h-16 flex items-center">
                       <span className="text-3xl sm:text-4xl font-semibold text-[#4C5C68] dark:text-white/75">
                         {role}
+                        
                       </span>
                     </div>
                   ))}
@@ -161,7 +204,7 @@ function Home() {
               >
                 <RiMapPinLine className="text-[20px] text-[#1985A1]" />
                 <span className="text-lg font-medium text-[#46494C] dark:text-[#DCDCDD]">
-                  Fergana region, Uzbekistan
+                  {profile?.address}
                 </span>
               </a>
 
@@ -172,8 +215,10 @@ function Home() {
                 className="flex flex-wrap gap-4 pt-4 justify-center lg:justify-start"
               >
                 <a
-                  href="/cv/Murodjon_CV.pdf"
-                  download
+                  href={cvUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                   
                   className="group flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-[#1985A1] text-white active:scale-95 transition-all duration-300 hover:shadow-lg hover:shadow-[#1985A1]/30"
                 >
                   <FiDownload className="text-[20px]" />

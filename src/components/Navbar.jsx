@@ -36,6 +36,7 @@ function Navbar() {
                      text-[#46494C] dark:text-[#DCDCDD]"
         >
           &lt;Murodjon/&gt;
+          
         </div>
 
         {/* Menu */}
