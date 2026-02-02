@@ -32,9 +32,6 @@ function Home() {
     { name: "Telegram", icon: FaTelegramPlane, href: `${profile?.telegram}` },
   ];
 
-  const frontendSkills = ["HTML", "CSS", "JavaScript", "React", "Tailwind"];
-  const backendSkills = ["Node.js", "Express", "REST API", "MongoDB"];
-
 
   useEffect(() => {
     let urlToClean = "";
@@ -45,6 +42,7 @@ function Home() {
   
         const main = await getMainPage();
         setProfile(main?.[0] || null);
+  console.log("main:", main);
   
         // ✅ CV pdf blob
         const blob = await getCvBlob();
@@ -81,12 +79,12 @@ function Home() {
     AOS.refresh();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentRole((prev) => (prev + 1) % roles.length);
-    }, 2600);
-    return () => clearInterval(interval);
-  }, [roles.length]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentRole((prev) => (prev + 1) % roles.length);
+  //   }, 2600);
+  //   return () => clearInterval(interval);
+  // }, [roles.length]);
 
   return (
     <section
@@ -178,7 +176,7 @@ function Home() {
                 data-aos-delay="240"
                 className="h-16 overflow-hidden flex justify-center lg:justify-start"
               >
-                <div
+                {/* <div
                   className="transition-transform duration-500 ease-in-out"
                   style={{ transform: `translateY(-${currentRole * 64}px)` }}
                 >
@@ -190,6 +188,11 @@ function Home() {
                       </span>
                     </div>
                   ))}
+                </div> */}
+
+
+                <div className="text-lg  text-[#46494cc4] dark:text-[#DCDCDD]">
+                  {profile?.profession_add}
                 </div>
               </div>
 
@@ -245,13 +248,13 @@ function Home() {
           {/* Frontend */}
           <div className="flex flex-col items-center md:items-end gap-3 text-[#46494C] dark:text-[#DCDCDD]">
             <span className="text-2xl font-semibold text-[#1985A1] md:mr-2">
-              Frontend
+            Skills
             </span>
             <div className="flex flex-wrap justify-center md:justify-end items-center gap-2">
-              {frontendSkills.map((item, i) => (
-                <span key={item} className="flex items-center text-[16px]">
+              {profile?.skills?.map((item, i) => (
+                <span key={`${item}-${i}`} className="flex items-center text-[16px]">
                   {item}
-                  {i !== frontendSkills.length - 1 && (
+                  {i !== profile?.skills?.length - 1 && (
                     <span className="mx-2 text-[#4C5C68] dark:text-[#C5C3C6]">
                       •
                     </span>
@@ -267,13 +270,13 @@ function Home() {
           {/* Backend */}
           <div className="flex flex-col items-center md:items-start gap-3 text-[#46494C] dark:text-[#DCDCDD]">
             <span className="text-2xl font-semibold text-[#1985A1] md:ml-2">
-              Backend
+            Tools
             </span>
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-2">
-              {backendSkills.map((item, i) => (
-                <span key={item} className="flex items-center text-[16px]">
+              {profile?.tools.map((item, i) => (
+                <span key={`${item}-${i}`} className="flex items-center text-[16px]">
                   {item}
-                  {i !== backendSkills.length - 1 && (
+                  {i !== profile?.tools.length - 1 && (
                     <span className="mx-2 text-[#4C5C68] dark:text-[#C5C3C6]">
                       •
                     </span>
