@@ -10,7 +10,7 @@ import { FiDownload } from "react-icons/fi";
 import { RiMapPinLine } from "react-icons/ri";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { BASE_URL,   getCvBlob,  getMainPage } from "../api/mainPage";
+import { BASE_URL, getCvBlob, getMainPage } from "../api/mainPage";
 
 function Home() {
   const [currentRole, setCurrentRole] = useState(0);
@@ -25,49 +25,42 @@ function Home() {
     "Web Developer",
   ];
 
-
   const socials = [
     { name: "GitHub", icon: FaGithub, href: `${profile?.github}` },
     { name: "LinkedIn", icon: FaLinkedinIn, href: `${profile?.linkedin}` },
     { name: "Telegram", icon: FaTelegramPlane, href: `${profile?.telegram}` },
   ];
 
-
   useEffect(() => {
     let urlToClean = "";
-  
+
     (async () => {
       try {
         setLoading(true);
-  
+
         const main = await getMainPage();
         setProfile(main?.[0] || null);
-  console.log("main:", main);
-  
+        console.log("main:", main);
+
         // ✅ CV pdf blob
         const blob = await getCvBlob();
-  
+
         // ✅ Blob -> URL
         urlToClean = URL.createObjectURL(blob);
         setCvUrl(urlToClean);
         console.log("urlToClean:", urlToClean);
-        
       } catch (e) {
         console.error(e);
       } finally {
         setLoading(false);
       }
     })();
-  
+
     // ✅ cleanup (memory leak bo‘lmasin)
     return () => {
       if (urlToClean) URL.revokeObjectURL(urlToClean);
     };
   }, []);
-
-
-
-
 
   useEffect(() => {
     AOS.init({
@@ -85,13 +78,27 @@ function Home() {
   //   }, 2600);
   //   return () => clearInterval(interval);
   // }, [roles.length]);
+  {
+    /* <div
+                  className="transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateY(-${currentRole * 64}px)` }}
+                >
+                  {roles.map((role, index) => (
+                    <div key={index} className="h-16 flex items-center">
+                      <span className="text-3xl sm:text-4xl font-semibold text-[#4C5C68] dark:text-white/75">
+                        {role}
+                        
+                      </span>
+                    </div>
+                  ))}
+                </div> */
+  }
 
   return (
     <section
       id="home"
       className="pb-[100px] lg:pb-[0]  min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-16 relative overflow-hidden"
     >
-      
       {/* Background Accents */}
       <div className="absolute inset-0 -z-10 overflow-hidden hidden dark:flex">
         <div
@@ -109,7 +116,6 @@ function Home() {
       <div className="container mx-auto max-w-7xl relative">
         {/* MAIN CONTENT */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-10">
-          
           {/* --- O'NG TOMON: AVATAR + SOCIALS --- */}
           <div className="order-1 lg:order-2 flex flex-col items-center">
             {/* Avatar Wrapper */}
@@ -166,50 +172,34 @@ function Home() {
                 data-aos-delay="160"
                 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]"
               >
-                Hi, I&apos;m <span className="text-[#1985A1]">{profile?.full_name}</span>
-                
+                Hi, I&apos;m{" "}
+                <span className="text-[#1985A1]">{profile?.full_name}</span>
               </h1>
 
               {/* Animated Role */}
               <div
-                data-aos="fade-up"
-                data-aos-delay="240"
-                className="h-16 overflow-hidden flex justify-center lg:justify-start"
+                data-aos="fade-down"
+                data-aos-delay="320"
+                className="h-16 overflow-hidden flex justify-center lg:justify-start text-lg  text-[#46494cc4] dark:text-[#DCDCDD]"
               >
-                {/* <div
-                  className="transition-transform duration-500 ease-in-out"
-                  style={{ transform: `translateY(-${currentRole * 64}px)` }}
-                >
-                  {roles.map((role, index) => (
-                    <div key={index} className="h-16 flex items-center">
-                      <span className="text-3xl sm:text-4xl font-semibold text-[#4C5C68] dark:text-white/75">
-                        {role}
-                        
-                      </span>
-                    </div>
-                  ))}
-                </div> */}
-
-
-                <div className="text-lg  text-[#46494cc4] dark:text-[#DCDCDD]">
-                  {profile?.profession_add}
-                </div>
+                {profile?.profession_add}
               </div>
 
               {/* Location */}
-              <a
+              <div
                 data-aos="fade-down"
                 data-aos-delay="320"
-                href="https://maps.app.goo.gl/FMvBVQZQFJHAKpoLA"
-                target="_blank"
-                rel="noopener noreferrer"
+                // href="#"
+                // href="https://maps.app.goo.gl/FMvBVQZQFJHAKpoLA"
+                // target="_blank"
+                // rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               >
                 <RiMapPinLine className="text-[20px] text-[#1985A1]" />
                 <span className="text-lg font-medium text-[#46494C] dark:text-[#DCDCDD]">
                   {profile?.address}
                 </span>
-              </a>
+              </div>
 
               {/* Buttons */}
               <div
@@ -221,7 +211,6 @@ function Home() {
                   href={cvUrl}
                   target="_blank"
                   rel="noreferrer"
-                   
                   className="group flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-[#1985A1] text-white active:scale-95 transition-all duration-300 hover:shadow-lg hover:shadow-[#1985A1]/30"
                 >
                   <FiDownload className="text-[20px]" />
@@ -248,11 +237,14 @@ function Home() {
           {/* Frontend */}
           <div className="flex flex-col items-center md:items-end gap-3 text-[#46494C] dark:text-[#DCDCDD]">
             <span className="text-2xl font-semibold text-[#1985A1] md:mr-2">
-            Skills
+              Skills
             </span>
             <div className="flex flex-wrap justify-center md:justify-end items-center gap-2">
               {profile?.skills?.map((item, i) => (
-                <span key={`${item}-${i}`} className="flex items-center text-[16px]">
+                <span
+                  key={`${item}-${i}`}
+                  className="flex items-center text-[16px]"
+                >
                   {item}
                   {i !== profile?.skills?.length - 1 && (
                     <span className="mx-2 text-[#4C5C68] dark:text-[#C5C3C6]">
@@ -270,11 +262,14 @@ function Home() {
           {/* Backend */}
           <div className="flex flex-col items-center md:items-start gap-3 text-[#46494C] dark:text-[#DCDCDD]">
             <span className="text-2xl font-semibold text-[#1985A1] md:ml-2">
-            Tools
+              Tools
             </span>
             <div className="flex flex-wrap justify-center md:justify-start items-center gap-2">
               {profile?.tools.map((item, i) => (
-                <span key={`${item}-${i}`} className="flex items-center text-[16px]">
+                <span
+                  key={`${item}-${i}`}
+                  className="flex items-center text-[16px]"
+                >
                   {item}
                   {i !== profile?.tools.length - 1 && (
                     <span className="mx-2 text-[#4C5C68] dark:text-[#C5C3C6]">

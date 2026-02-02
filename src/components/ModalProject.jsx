@@ -1,112 +1,162 @@
-import React from 'react'
-import { FaGithub, FaExternalLinkAlt, FaTimes, FaLayerGroup, FaCalendarAlt } from "react-icons/fa";
-function ModalProject({ selectedProject, setSelectedProject }) {
+import React, { useState, useEffect } from 'react';
+import { FaGithub, FaExternalLinkAlt, FaTimes, FaLayerGroup, FaCalendarAlt, FaImage } from "react-icons/fa";
+
+function ModalProject({ selectedProject, setSelectedProject, FALLBACK_IMG }) {
+  
+  // Hozirgi tanlangan katta rasm uchun state
+  const [activeImage, setActiveImage] = useState("");
+
+  // Modal ochilganda yoki loyiha o'zgarganda birinchi rasmni tanlash
+  useEffect(() => {
+    if (selectedProject?.photos && selectedProject.photos.length > 0) {
+      setActiveImage(selectedProject.photos[0]);
+    } else {
+      setActiveImage(FALLBACK_IMG);
+    }
+  }, [selectedProject, FALLBACK_IMG]);
+
+  if (!selectedProject) return null;
+
   return (
     <div
-    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-[fadeIn_0.3s_ease-in-out]"
-    onClick={() => setSelectedProject(null)}
-  >
-    <div
-      className="bg-white dark:bg-[#1f1f1f] w-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90vh]"
-      onClick={(e) => e.stopPropagation()}
-      data-aos="zoom-in"
-      data-aos-duration="300"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-[fadeIn_0.3s_ease-in-out] "
+      onClick={() => setSelectedProject(null)}
     >
-      {/* Close Button */}
-      <button
-        onClick={() => setSelectedProject(null)}
-        className="absolute top-4 right-4 z-20 p-2 bg-black/50 hover:bg-[#1985A1] text-white rounded-full transition-colors"
+      <div
+        className="bg-white dark:bg-[#1e1e1e] w-full max-w-5xl rounded-2xl overflow-hidden shadow-2xl relative flex flex-col md:flex-row h-[85vh] md:h-[80vh] max-h-[800px]   overflow-y-auto custom-scrollbar"
+        onClick={(e) => e.stopPropagation()}
+        data-aos="zoom-in"
       >
-        <FaTimes size={18} />
-      </button>
-
-      {/* Left Side: Images Gallery */}
-      <div className="w-full md:w-1/2 bg-black flex flex-col overflow-y-auto custom-scrollbar h-[40vh] md:h-auto border-r border-gray-800">
-        {/* Har doim 1-rasm katta bo'lib turadi */}
-        <div className="w-full h-full min-h-[300px]">
-           <img
-            src={selectedProject.images[0]}
-            alt="Main Project"
-            className="w-full h-full object-cover"
-          />
-        </div>
         
-        {/* Agar 1 tadan ko'p rasm bo'lsa, pastda qolganlari chiqadi */}
-        {selectedProject.images.length > 1 && (
-          <div className="grid grid-cols-2 gap-1 p-1 bg-[#121212]">
-            {selectedProject.images.slice(1).map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`Gallery ${idx}`}
-                className="w-full h-32 object-cover hover:opacity-80 transition-opacity cursor-pointer"
-              />
-            ))}
-          </div>
-        )}
-      </div>
+        {/* Close Button (Sticky & Visible) */}
+        <button
+          onClick={() => setSelectedProject(null)}
+          className="absolute top-4 right-4 z-30 p-2 bg-black/60 hover:bg-[#1985A1] text-white rounded-full transition-all duration-300 backdrop-blur-sm shadow-lg"
+        >
+          <FaTimes size={20} />
+        </button>
 
-      {/* Right Side: Details */}
-      <div className="w-full md:w-1/2 p-8 flex flex-col overflow-y-auto">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-             <span className="text-[#1985A1] font-bold tracking-wider text-sm uppercase">
-              {selectedProject.category}
-            </span>
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-              <FaCalendarAlt className="mr-2"/> {selectedProject.date}
+        {/* --- LEFT SIDE: IMAGE GALLERY --- */}
+        <div className="w-full md:w-[55%] bg-black/5 dark:bg-black flex flex-col relative">
+          
+          {/* Main Active Image Area */}
+          <div className="flex-1 relative w-full h-64 object-cover  overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-[#121212]">
+            <img
+              key={activeImage}
+              src={activeImage}
+              alt={selectedProject?.project_name}
+              className="w-full h-full object-contain md:object-cover animate-[fadeIn_0.5s_ease-out]"
+            />
+          </div>
+
+          {/* Thumbnails (Kichik rasmlar) */}
+          {selectedProject.photos && selectedProject.photos.length > 1 && (
+            <div className="p-4 bg-white dark:bg-[#252525] border-t border-gray-200 dark:border-gray-800">
+               <p className="text-xs text-gray-500 mb-2 font-medium uppercase tracking-wide flex items-center gap-1">
+                 <FaImage/> Gallery ({selectedProject.photos.length})
+               </p>
+               <div className="flex gap-3 overflow-x-auto p-1 custom-scrollbar">
+                {selectedProject.photos.map((img, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setActiveImage(img)}
+                    className={`
+                      relative w-20 h-14 md:w-24 md:h-16 flex-shrink-0 cursor-pointer rounded-lg overflow-hidden transition-all duration-300  
+                      ${activeImage === img 
+                        ? "ring-2 ring-[#1985A1] opacity-100 scale-105" 
+                        : "opacity-60 hover:opacity-100 hover:scale-105 hover:ring-1 hover:ring-gray-900"}
+                    `}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* --- RIGHT SIDE: DETAILS --- */}
+        <div className=" w-full md:w-[45%] flex flex-col h-full bg-white dark:bg-[#1e1e1e]">
+          
+          {/* Scrollable Content */}
+          <div className="flex-1  p-6 md:p-8">
+            
+            {/* Header: Date & Category (agar bo'lsa) */}
+            <div className="flex items-center justify-between mb-3">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#1985A1]/10 text-[#1985A1]">
+                <FaCalendarAlt className="mr-2"/> 
+                {new Date(selectedProject.deployed_date).toLocaleDateString("uz-UZ")}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 dark:text-white mb-4 leading-tight">
+              {selectedProject?.project_name}
+            </h2>
+
+            {/* Description */}
+            <div className="prose dark:prose-invert max-w-none">
+              <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
+                {selectedProject?.description}
+              </p>
+            </div>
+
+            {/* Tech Stack */}
+            <div className="mt-8">
+              <h4 className="text-sm font-bold text-gray-900 dark:text-white uppercase mb-4 flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+                 <FaLayerGroup className="text-[#1985A1]" /> Technologies
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {selectedProject.technologies?.map((tech, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-[#2d2d2d] text-gray-700 dark:text-gray-200 text-sm rounded-md border border-gray-200 dark:border-gray-600 hover:border-[#1985A1] transition-colors cursor-default"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
-         
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
-            {selectedProject.title}
-          </h2>
-          
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-base">
-            {selectedProject.description}
-          </p>
-        </div>
 
-        {/* Technologies */}
-        <div className="mb-8">
-          <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase mb-3 flex items-center gap-2">
-             <FaLayerGroup className="text-[#1985A1]" /> Tech Stack
-          </h4>
-          <div className="flex flex-wrap gap-2">
-            {selectedProject.tech.map((tech, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm rounded-lg border border-gray-200 dark:border-gray-600"
+          {/* Footer: Action Buttons (Fixed at bottom) */}
+          <div className="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1a1a]">
+            <div className="flex gap-4">
+              <a
+                href={selectedProject?.project_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5
+                  ${selectedProject?.project_url 
+                    ? "bg-[#1985A1] text-white hover:bg-[#156f85] shadow-[#1985A1]/20" 
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}
+                `}
               >
-                {tech}
-              </span>
-            ))}
+                Live Demo <FaExternalLinkAlt size={14} />
+              </a>
+              <a
+                href={selectedProject?.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 border rounded-xl font-semibold transition-all hover:-translate-y-0.5
+                  ${selectedProject?.github_url
+                    ? "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    : "border-gray-200 text-gray-400 cursor-not-allowed"}
+                `}
+              >
+                <FaGithub size={18} /> Code
+              </a>
+            </div>
           </div>
-        </div>
 
-        {/* Action Buttons (Footer) */}
-        <div className="mt-auto flex gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <a
-            href={selectedProject.live}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#1985A1] text-white rounded-xl font-semibold hover:bg-[#146b82] transition-all shadow-lg hover:shadow-[#1985A1]/30"
-          >
-            Live Demo <FaExternalLinkAlt size={14} />
-          </a>
-          <a
-            href={selectedProject.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-          >
-            <FaGithub size={18} /> Code
-          </a>
         </div>
       </div>
     </div>
-  </div>
-  )
+  );
 }
 
-export default ModalProject
+export default ModalProject;

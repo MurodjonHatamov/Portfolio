@@ -12,6 +12,27 @@ import { useEffect, useState } from 'react'
 import { getMainPage } from './api/mainPage'
 
 function App() {
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+
+        const main = await getMainPage();
+        setProfile(main?.[0] || null);
+  
+
+
+     
+             
+      } catch (e) {
+        console.error(e);
+      } finally {
+     
+      }
+    })();
+
+
+  }, []);
 
 
 
@@ -19,11 +40,11 @@ function App() {
   return (
     <>
   <BrowserRouter>
-  <Navbar/>
+  <Navbar profile={profile}/>
   <Sidebar/>
   <Routes>
     <Route path='/' element={ <Home/> } />
-    <Route path='/projects' element={ <Projects/> } />
+    <Route path='/projects' element={ <Projects profile={profile}/> } />
     <Route path='/experience' element={ <Experience/> } />
     <Route path='/contact' element={ <Contact/> } />
     <Route path='/blog' element={ <Blog/> } />

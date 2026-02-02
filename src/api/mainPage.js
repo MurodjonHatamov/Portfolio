@@ -19,4 +19,3 @@ export async function request(rest) {
 
 export const getMainPage = () => request("/mainpage");
 export const getCvBlob = () => request("/mainpage/cv");
-export const getProjects = () => request("/projects");

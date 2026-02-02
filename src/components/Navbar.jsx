@@ -3,7 +3,9 @@ import { FaRegSun } from "react-icons/fa";
 import { MdOutlineDarkMode } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 
-function Navbar() {
+function Navbar({profile}) {
+
+  
   const getInitialTheme = () => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark" || saved === "light") return saved;
@@ -35,7 +37,7 @@ function Navbar() {
           className="text-xl md:text-3xl font-semibold tracking-wide
                      text-[#46494C] dark:text-[#DCDCDD]"
         >
-          &lt;Murodjon/&gt;
+          &lt;{profile?.full_name}/&gt;
           
         </div>
 
