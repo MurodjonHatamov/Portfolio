@@ -1,31 +1,60 @@
 import React, { useEffect, useState } from "react";
-import { FiUser, FiMail, FiMessageSquare, FiSend, FiPhone, FiTag, FiCheck } from "react-icons/fi";
+import {
+  FiUser,
+  FiMessageSquare,
+  FiSend,
+  FiPhone,
+  FiTag,
+  FiCheck,
+} from "react-icons/fi";
+import { FaGithub, FaLinkedinIn, FaInstagram, FaTelegramPlane } from "react-icons/fa";
+
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { sendContact } from "../api/apis";
 
-function Contact() {
+function Contact({profile}) {
   const [form, setForm] = useState({
     name: "",
     phone_tg: "",
     theme: "",
     text: "",
   });
-const [loading, setLoading] = useState(false);
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [ok, setOk] = useState(false);
 
-  
+  // ✅ Socials (o'zingiznikiga moslab qo'ying)
+
+  const socials = [
+    { name: "GitHub", icon: FaGithub, href: `${profile?.github}` },
+    { name: "LinkedIn", icon: FaLinkedinIn, href: `${profile?.linkedin}` },
+    { name: "Instagram", icon: FaInstagram, href: profile?.instagram || "https://instagram.com" },
+    { name: "Telegram", icon: FaTelegramPlane, href: `${profile?.telegram}` },
+  ];
+
   const onChange = (key) => (e) => {
     setForm((p) => ({ ...p, [key]: e.target.value }));
   };
+
+  // ✅ error/success 3 sekunddan keyin yo'qoladi
+  useEffect(() => {
+    if (!error && !ok) return;
+
+    const t = setTimeout(() => {
+      setError("");
+      setOk(false);
+    }, 3000);
+
+    return () => clearTimeout(t);
+  }, [error, ok]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setOk(false);
 
-    // minimal validation
     if (!form.name.trim() || !form.text.trim()) {
       setError("Ism va xabar to'ldirilishi kerak.");
       return;
@@ -33,6 +62,7 @@ const [loading, setLoading] = useState(false);
 
     try {
       setLoading(true);
+
       await sendContact({
         name: form.name.trim(),
         phone_tg: form.phone_tg.trim(),
@@ -43,7 +73,7 @@ const [loading, setLoading] = useState(false);
       setOk(true);
       setForm({ name: "", phone_tg: "", theme: "", text: "" });
     } catch (err) {
-      setError(err.message || "Xatolik yuz berdi");
+      setError(err?.message || "Xatolik yuz berdi");
     } finally {
       setLoading(false);
     }
@@ -56,12 +86,15 @@ const [loading, setLoading] = useState(false);
       once: true,
       offset: 80,
     });
+    AOS.refresh();
   }, []);
 
   return (
     <section
       id="contact"
-      className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-3"
+      className="pb-[100px] lg:pb-[0]  min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-16 relative overflow-hidden
+      
+      "
     >
       {/* CENTER CARD */}
       <div
@@ -76,25 +109,53 @@ const [loading, setLoading] = useState(false);
         "
       >
         {/* Title */}
-        <div
-          className="text-center mb-8"
-          data-aos="fade-up"
-          data-aos-delay="100"
-        >
+        <div className="text-center mb-8" data-aos="fade-up" data-aos-delay="100">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#46494C] dark:text-[#DCDCDD]">
             Contact
           </h2>
           <p className="mt-2 text-[#4C5C68] dark:text-white/60">
             Xabar qoldiring — tez orada javob beraman
           </p>
+
+          {/* ✅ Social icons */}
+          <div className="mt-5 flex items-center justify-center gap-3" data-aos="fade-up" data-aos-delay="160">
+            {socials.map((s) => {
+              const Icon = s.icon;
+              return (
+                <a
+                  key={s.name}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.name}
+                  title={s.name}
+                  className="
+                    w-12 h-12 rounded-2xl
+                    border border-black/10 dark:border-white/10
+                    bg-white/45 dark:bg-white/5 backdrop-blur
+                    flex items-center justify-center
+                    text-[#4C5C68] dark:text-white/70
+                    hover:text-[#1985A1] hover:border-[#1985A1]/40
+                    hover:shadow-lg hover:-translate-y-1
+                    active:scale-90
+                    transition-all duration-300
+                    cursor-pointer
+                  "
+                >
+                  <Icon className="text-xl" />
+                </a>
+              );
+            })}
+          </div>
         </div>
-   {/* Alerts */}
-   {error && (
+
+        {/* Alerts (3s auto hide) */}
+        {error && (
           <div className="mb-5 rounded-2xl p-4 border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-semibold">
             {error}
           </div>
         )}
-        
+
         {ok && (
           <div className="mb-5 rounded-2xl p-4 border border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-400 text-sm font-semibold flex items-center gap-2">
             <FiCheck /> Xabar yuborildi!
@@ -102,7 +163,7 @@ const [loading, setLoading] = useState(false);
         )}
 
         {/* FORM */}
-        <form  onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-5">
           {/* Name */}
           <div data-aos="fade-up" data-aos-delay="200" className="relative">
             <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4C5C68]" />
@@ -124,35 +185,14 @@ const [loading, setLoading] = useState(false);
             />
           </div>
 
-          {/* Email */}
-          <div className="relative">
+          {/* Phone / Telegram */}
+          <div data-aos="fade-up" data-aos-delay="240" className="relative">
             <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4C5C68]" />
             <input
               value={form.phone_tg}
               onChange={onChange("phone_tg")}
               type="text"
-              placeholder="Telephone number "
-              className="
-                w-full pl-11 pr-4 py-3 rounded-2xl
-                bg-transparent
-                border border-black/10 dark:border-white/10
-                text-[#46494C] dark:text-[#DCDCDD]
-                placeholder:text-[#4C5C68]/70 dark:placeholder:text-white/40
-                outline-none
-                focus:border-[#1985A1]/50
-                transition
-              "
-            />
-          </div>
-          
-          {/* Theme */}
-          <div className="relative">
-            <FiTag className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4C5C68]" />
-            <input
-              value={form.theme}
-              onChange={onChange("theme")}
-              type="text"
-              placeholder="Mavzu (masalan: Portfolio / Job / Project)"
+              placeholder="Telephone number"
               className="
                 w-full pl-11 pr-4 py-3 rounded-2xl
                 bg-transparent
@@ -166,6 +206,26 @@ const [loading, setLoading] = useState(false);
             />
           </div>
 
+          {/* Theme */}
+          <div data-aos="fade-up" data-aos-delay="280" className="relative">
+            <FiTag className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4C5C68]" />
+            <input
+              value={form.theme}
+              onChange={onChange("theme")}
+              type="text"
+              placeholder="Mavzu (Portfolio / Job / Project)"
+              className="
+                w-full pl-11 pr-4 py-3 rounded-2xl
+                bg-transparent
+                border border-black/10 dark:border-white/10
+                text-[#46494C] dark:text-[#DCDCDD]
+                placeholder:text-[#4C5C68]/70 dark:placeholder:text-white/40
+                outline-none
+                focus:border-[#1985A1]/50
+                transition
+              "
+            />
+          </div>
 
           {/* Message */}
           <div data-aos="fade-up" data-aos-delay="320" className="relative">
@@ -191,6 +251,7 @@ const [loading, setLoading] = useState(false);
           {/* Submit */}
           <button
             type="submit"
+            disabled={loading}
             className="
               w-full mt-2
               flex items-center justify-center gap-2
@@ -200,9 +261,10 @@ const [loading, setLoading] = useState(false);
               hover:opacity-95
               active:scale-95
               transition-all
+              disabled:opacity-60 disabled:cursor-not-allowed
             "
           >
-            Send message
+            {loading ? "Sending..." : "Send message"}
             <FiSend />
           </button>
         </form>

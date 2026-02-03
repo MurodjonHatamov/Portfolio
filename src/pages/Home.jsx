@@ -28,6 +28,7 @@ function Home() {
   const socials = [
     { name: "GitHub", icon: FaGithub, href: `${profile?.github}` },
     { name: "LinkedIn", icon: FaLinkedinIn, href: `${profile?.linkedin}` },
+    { name: "Instagram", icon: FaInstagram, href: profile?.instagram || "https://instagram.com" },
     { name: "Telegram", icon: FaTelegramPlane, href: `${profile?.telegram}` },
   ];
 
@@ -128,14 +129,24 @@ function Home() {
                 {/* Glow */}
                 <div className="absolute -inset-6 rounded-full blur-3xl opacity-30 bg-[#1985A1] hidden dark:block" />
 
-                {/* Avatar body */}
-                <div className="relative w-full h-full rounded-full bg-[#C5C3C6] dark:bg-[#46494C] border border-[#4C5C68]/30 dark:border-[#C5C3C6]/20 flex items-center justify-center backdrop-blur">
-                  <div className="w-[90%] h-[90%] rounded-full bg-[#DCDCDD] dark:bg-[#4C5C68]/60 flex items-center justify-center">
-                    <span className="text-[140px] sm:text-[200px] font-bold leading-none text-[#46494C] dark:text-[#DCDCDD] select-none">
-                      M
-                    </span>
-                  </div>
-                </div>
+                <div className="relative w-full h-full rounded-full overflow-hidden ...">
+  {profile?.photos?.[0] ? (
+    <img
+      src={profile.photos[0]}
+      alt={profile.full_name}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+       <div className="relative w-full h-full rounded-full bg-[#C5C3C6] dark:bg-[#46494C] border border-[#4C5C68]/30 dark:border-[#C5C3C6]/20 flex items-center justify-center backdrop-blur">
+       <div className="w-[90%] h-[90%] rounded-full bg-[#DCDCDD] dark:bg-[#4C5C68]/60 flex items-center justify-center">
+         <span className="text-[140px] sm:text-[200px] font-bold leading-none text-[#46494C] dark:text-[#DCDCDD] select-none">
+           M
+         </span>
+       </div>
+     </div>
+  )}
+</div>
+
               </div>
             </div>
 
@@ -177,13 +188,21 @@ function Home() {
               </h1>
 
               {/* Animated Role */}
-              <div
-                data-aos="fade-down"
-                data-aos-delay="320"
-                className="h-16 overflow-hidden flex justify-center lg:justify-start text-lg  text-[#46494cc4] dark:text-[#DCDCDD]"
-              >
-                {profile?.profession_add}
-              </div>
+              <p
+  data-aos="fade-down"
+  data-aos-delay="320"
+  className="
+    mt-2
+    text-[18px] sm:text-[20px] lg:text-[22px]
+    leading-relaxed
+    text-[#4C5C68] dark:text-white/70
+    max-w-xl
+    lg:text-left text-center
+    line-clamp-3
+  "
+>
+  {profile?.profession_add}
+</p>
 
               {/* Location */}
               <div

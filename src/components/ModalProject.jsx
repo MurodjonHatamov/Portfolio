@@ -40,14 +40,17 @@ function ModalProject({ selectedProject, setSelectedProject, FALLBACK_IMG }) {
         <div className="w-full md:w-[55%] bg-black/5 dark:bg-black flex flex-col relative">
           
           {/* Main Active Image Area */}
-          <div className="flex-1 relative w-full h-64 object-cover  overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-[#121212]">
-            <img
-              key={activeImage}
-              src={activeImage}
-              alt={selectedProject?.project_name}
-              className="w-full h-full object-contain md:object-cover animate-[fadeIn_0.5s_ease-out]"
-            />
-          </div>
+          <div className="flex-1 relative w-full overflow-hidden bg-gray-100 dark:bg-[#121212]">
+  <div className="relative w-full aspect-video">
+    <img
+      key={activeImage}
+      src={activeImage}
+      alt={selectedProject?.project_name}
+      className="absolute inset-0 w-full h-full object-contain animate-[fadeIn_0.35s_ease-out]"
+    />
+  </div>
+</div>
+
 
           {/* Thumbnails (Kichik rasmlar) */}
           {selectedProject.photos && selectedProject.photos.length > 1 && (
