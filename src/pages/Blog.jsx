@@ -1,35 +1,74 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getBlogs } from "../api/apis";
+import { FaCalendarAlt, FaEye } from "react-icons/fa";
 
 function Blog() {
-  const posts = [
-    {
-      id: 1,
-      title: "How I Build Clean UI with React & Tailwind",
-      desc: "Minimal dizayn va toza UI yaratishda e’tibor beradigan asosiy nuqtalar.",
-      date: "Aug 2026",
-      readTime: "5 min read",
-    },
-    {
-      id: 2,
-      title: "Why Minimalism Matters in Web Design",
-      desc: "Nega kamroq element — ko‘proq sifat degani ekanini tushuntiraman.",
-      date: "Jul 2026",
-      readTime: "4 min read",
-    },
-    {
-      id: 3,
-      title: "My Frontend Learning Path",
-      desc: "Frontend dasturlashni qanday bosqichma-bosqich o‘rgandim.",
-      date: "Jun 2026",
-      readTime: "6 min read",
-    },
-  ];
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        setErr("");
+        setLoading(true);
+        const data = await getBlogs();
+        if (!alive) return;
+        setPosts(Array.isArray(data) ? data : []);
+        console.log(data);
+        
+      } catch (e) {
+        if (!alive) return;
+        setErr(e?.message || "Xatolik yuz berdi");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // 5-6 ta so'z preview
+  const previewWords = (text = "", limit = 6) => {
+    const words = String(text).trim().split(/\s+/).filter(Boolean);
+    if (words.length <= limit) return words.join(" ");
+    return words.slice(0, limit).join(" ") + " ...";
+  };
+
+  // ✅ o‘qish vaqtini hisoblash (200 wpm)
+  const calcReadTime = (text = "", wpm = 200) => {
+    const words = String(text).trim().split(/\s+/).filter(Boolean).length;
+    const minutes = Math.max(1, Math.ceil(words / wpm));
+    return `${minutes} min read`;
+  };
+
+
+
+  const normalized = useMemo(() => {
+    return posts.map((p) => {
+      const title = p?.title || "Untitled";
+      const desc = p?.description || "";
+      const fullText = `${title} ${desc}`;
+      return {
+        _id: p?._id,
+        title,
+        description: desc,
+        readTime: calcReadTime(fullText),
+        // agar keyin backend "createdAt" qo'shsa shu ishlaydi
+        date: p?.createdAt ? p.createdAt : new Date().toISOString(),
+        views:p?.views
+      };
+    });
+  }, [posts]);
 
   return (
-    <section
-      id="blog"
-      className="min-h-screen px-4 sm:px-6 lg:px-8 pt-24 pb-20"
-    >
+    <section id="blog" className="min-h-screen px-4 sm:px-6 lg:px-8 pt-24 pb-20">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-14 text-center">
@@ -41,55 +80,84 @@ function Blog() {
           </p>
         </div>
 
-        {/* Posts */}
-        <div className="space-y-6">
-          {posts.map((post) => (
-            <article
-              key={post.id}
-              className="
-                group p-6 sm:p-8 rounded-3xl
-                border border-black/10 dark:border-white/10
-                bg-white/60 dark:bg-white/5
-                backdrop-blur
-                hover:border-[#1985A1]/40
-                transition-all
-              "
-            >
-              {/* Meta */}
-              <div className="flex items-center gap-3 text-sm text-[#4C5C68] dark:text-white/50 mb-2">
-                <span>{post.date}</span>
-                <span>•</span>
-                <span>{post.readTime}</span>
-              </div>
+        {/* Error */}
+        {!loading && err && (
+          <div className="mb-8 rounded-3xl p-4 border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400 text-center font-semibold">
+            {err}
+          </div>
+        )}
 
-              {/* Title */}
-              <h2
+        {/* Loading */}
+        {loading && (
+          <div className="space-y-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="p-6 sm:p-8 rounded-3xl border border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur"
+              >
+                <div className="h-4 w-40 bg-black/10 dark:bg-white/10 rounded animate-pulse" />
+                <div className="mt-4 h-7 w-3/4 bg-black/10 dark:bg-white/10 rounded animate-pulse" />
+                <div className="mt-3 h-5 w-full bg-black/10 dark:bg-white/10 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Posts */}
+        {!loading && !err && (
+          <div className="space-y-6">
+            {normalized.map((post) => (
+              <article
+                key={post._id}
+                onClick={() => navigate(`/blog/${post._id}`)}
                 className="
-                  text-2xl sm:text-3xl font-semibold
-                  text-[#46494C] dark:text-[#DCDCDD]
-                  group-hover:text-[#1985A1]
-                  transition-colors
+                  group p-3 sm:p-3 sm:pl-4 rounded-2xl cursor-pointer
+                  border border-black/10 dark:border-white/10
+                  bg-white/60 dark:bg-white/5 backdrop-blur
+                  hover:border-[#1985A1]/40 transition-all
+                  active:scale-[0.99]
                 "
               >
-                {post.title}
-              </h2>
+            
 
-              {/* Description */}
-              <p className="mt-3 text-[#4C5C68] dark:text-white/65 leading-relaxed">
-                {post.desc}
-              </p>
+                {/* Title (preview) */}
+                <h2
+                  className="
+                    text-2xl sm:text-3xl font-semibold
+                    text-[#46494C] dark:text-[#DCDCDD]
+                    group-hover:text-[#1985A1]
+                    transition-colors
+                    line-clamp-1
+                    
+                  "
+                >
+                  {previewWords(post.title, 8)}
+                </h2>
 
-              {/* Read more */}
-              <div className="mt-5">
-                <span className="text-sm font-semibold text-[#1985A1]">
-                  Read article →
-                </span>
-              </div>
-            </article>
-          ))}
-        </div>
+                {/* Desc (5-6 words) + Read more */}
+                <p className="mt-3    line-clamp-1 text-[#4C5C68] dark:text-white/65 leading-relaxed">
+                  {previewWords(post.description,12)}
+               
+                </p>
+           <div className="flex items-center justify-between">
+           <span className=" text-[#1985A1] font-semibold block mt-1">
+                    Read more →
+                  </span>
 
-        {/* Empty / Footer note */}
+<div className="flex items-center gap-2">
+<span className=" text-[#C5C3C6] flex items-center gap-1 text-[15px]"><FaCalendarAlt />{ new Date(post.date).toLocaleDateString("uz-UZ")}</span>
+<span className="text-[#C5C3C6] flex items-center gap-1 text-[15px]">
+<FaEye />
+{post.views}
+</span>
+</div>
+
+           </div>
+              </article>
+            ))}
+          </div>
+        )}
+
         <div className="mt-16 text-center text-sm text-[#4C5C68] dark:text-white/40">
           Yangi postlar tez orada ✍️
         </div>
@@ -99,4 +167,3 @@ function Blog() {
 }
 
 export default Blog;
-    

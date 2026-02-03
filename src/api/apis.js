@@ -1,3 +1,5 @@
+import { PiUserCheckDuotone } from "react-icons/pi";
+
 export const BASE_URL = "http://localhost:7700";
 
 
@@ -47,4 +49,27 @@ export async function sendContact(payload) {
   }
 
   return data; // {name, phone_tg, theme, text, _id...}
+}
+
+
+
+
+// Bu api blog bo'limi uchun mo'ljallangan bo'lib, blog postlarini olish uchun ishlatiladi.
+
+export async function getBlogs() {
+  const res = await fetch(`${BASE_URL}/blog`, {
+    method: "GET",
+    headers: { accept: "*/*" },
+  });
+  if (!res.ok) throw new Error("Bloglarni olishda xatolik");
+  return res.json(); // array
+}
+
+export async function getBlogById(id) {
+  const res = await fetch(`${BASE_URL}/blog/${id}`, {
+    method: "GET",
+    headers: { accept: "*/*" },
+  });
+  if (!res.ok) throw new Error("Blogni olishda xatolik");
+  return res.json(); // object
 }

@@ -10,6 +10,7 @@ import Contact from './pages/Contact'
 import Blog from './pages/Blog'
 import { useEffect, useState } from 'react'
 import { getMainPage } from './api/mainPage'
+import BlogDetail from './pages/BlogDetail'
 
 function App() {
   const [profile, setProfile] = useState(null);
@@ -48,6 +49,7 @@ function App() {
     <Route path='/experience' element={ <Experience/> } />
     <Route path='/contact' element={ <Contact profile={profile}/> } />
     <Route path='/blog' element={ <Blog/> } />
+    <Route path="/blog/:id" element={<BlogDetail />} />
   </Routes>
   </BrowserRouter>
     </>
