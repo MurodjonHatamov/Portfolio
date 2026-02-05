@@ -7,12 +7,14 @@ import {
   BiBriefcase,
   BiMessageSquareDetail,
 } from "react-icons/bi";
+import { TbCertificate } from "react-icons/tb";
 
 function Sidebar() {
 
   const navItems = [
     { to: "/", icon: BiHomeAlt2, label: "Home" },
     { to: "/experience", icon: BiUser, label: "Experience" },
+    {to: "/achievements", icon: TbCertificate, label: "Achievements"},
     { to: "/blog", icon: BiCodeAlt, label: "Blog" },
     { to: "/projects", icon: BiBriefcase, label: "Projects" },
     { to: "/contact", icon: BiMessageSquareDetail, label: "Contact" },

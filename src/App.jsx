@@ -11,6 +11,7 @@ import Blog from './pages/Blog'
 import { useEffect, useState } from 'react'
 import { getMainPage } from './api/mainPage'
 import BlogDetail from './pages/BlogDetail'
+import Achievements from './pages/Achievements'
 
 function App() {
   const [profile, setProfile] = useState(null);
@@ -50,6 +51,7 @@ function App() {
     <Route path='/contact' element={ <Contact profile={profile}/> } />
     <Route path='/blog' element={ <Blog/> } />
     <Route path="/blog/:id" element={<BlogDetail />} />
+    <Route path='/achievements' element={ <Achievements/>} />
   </Routes>
   </BrowserRouter>
     </>

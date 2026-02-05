@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaRegSun } from "react-icons/fa";
 import { MdOutlineDarkMode } from "react-icons/md";
 import { NavLink } from "react-router-dom";
+import Sk from "./Sk";
 
 function Navbar({profile}) {
 
@@ -33,13 +34,19 @@ function Navbar({profile}) {
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-18 md:h-20">
         {/* Logo */}
-        <div
+
+        {
+          profile ? <>
+             <div
           className="text-xl md:text-3xl font-semibold tracking-wide
                      text-[#46494C] dark:text-[#DCDCDD]"
         >
           &lt;{profile?.full_name}/&gt;
           
-        </div>
+        </div></> :
+<Sk className="w-40 h-6"/>
+        }
+
 
         {/* Menu */}
         <ul
@@ -50,6 +57,7 @@ function Navbar({profile}) {
             { name: "Home", to: "/" },
             { name: "Projects", to: "/projects" },
             { name: "Experience", to: "/experience" },
+            {name:" Achievements", to:"/achievements"},
             { name: "Blog", to: "/blog" },
             { name: "Contact", to: "/contact" },
           ].map((item) => (
