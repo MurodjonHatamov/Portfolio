@@ -161,7 +161,7 @@ function Home() {
                   className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]"
                 >
                   Hi, I&apos;m{" "}
-                  <span className="text-[#1985A1]">{profile?.full_name || "Murodjon"}</span>
+                  <span className="text-[#1985A1]">{profile?.full_name || "Developer"}</span>
                 </h1>
               )}
 

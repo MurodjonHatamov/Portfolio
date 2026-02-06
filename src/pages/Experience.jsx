@@ -33,6 +33,8 @@ function Experience() {
         const data = await getExperience();
         if (cancelled) return;
         setExperiences(Array.isArray(data) ? data : []);
+        console.log(data);
+        
       } catch (e) {
         if (cancelled) return;
         setError(e?.message || "Experience olishda xatolik");

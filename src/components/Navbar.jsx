@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaRegSun } from "react-icons/fa";
 import { MdOutlineDarkMode } from "react-icons/md";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Sk from "./Sk";
 
 function Navbar({profile}) {
@@ -37,13 +37,13 @@ function Navbar({profile}) {
 
         {
           profile ? <>
-             <div
+             <Link to={"/"}
           className="text-xl md:text-3xl font-semibold tracking-wide
                      text-[#46494C] dark:text-[#DCDCDD]"
         >
           &lt;{profile?.full_name}/&gt;
           
-        </div></> :
+        </Link></> :
 <Sk className="w-40 h-6"/>
         }
 

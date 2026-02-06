@@ -4,14 +4,16 @@ import './App.css'
 import Home from './pages/Home'
 import Navbar from './components/Navbar'
 import Projects from './pages/Projects'
-import Sidebar from './components/Sidebar'
 import Experience from './pages/Experience'
 import Contact from './pages/Contact'
 import Blog from './pages/Blog'
+
 import { useEffect, useState } from 'react'
 import { getMainPage } from './api/mainPage'
 import BlogDetail from './pages/BlogDetail'
 import Achievements from './pages/Achievements'
+import BottomNavigator from './components/BottomNavigator'
+import AdminRoutes from './router/AdminRoutes'
 
 function App() {
   const [profile, setProfile] = useState(null);
@@ -43,8 +45,10 @@ function App() {
     <>
   <BrowserRouter>
   <Navbar profile={profile}/>
-  <Sidebar/>
+ <BottomNavigator/>
+
   <Routes>
+
     <Route path='/' element={ <Home/> } />
     <Route path='/projects' element={ <Projects profile={profile}/> } />
     <Route path='/experience' element={ <Experience/> } />
@@ -52,6 +56,9 @@ function App() {
     <Route path='/blog' element={ <Blog/> } />
     <Route path="/blog/:id" element={<BlogDetail />} />
     <Route path='/achievements' element={ <Achievements/>} />
+
+
+    <Route path="/admin/*" element={<AdminRoutes />} />
   </Routes>
   </BrowserRouter>
     </>
