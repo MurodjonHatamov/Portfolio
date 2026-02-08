@@ -4,12 +4,22 @@ import "aos/dist/aos.css";
 import ModalProject from "../components/ModalProject";
 import { getProjects } from "../api/apis";
 import Sk from "../components/Sk";
+import { getLang, pickLang } from "../api/mainPage";
 
 function Projects({ profile }) {
   const [selectedProject, setSelectedProject] = useState(null);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+const lang = useMemo(() => getLang(), []);
+  
+const descriptionText = useMemo(() => pickLang(selectedProject?.description, lang), [lang, selectedProject]);
+console.log(descriptionText);
+
+
+
+
 
   const FALLBACK_IMG =
     "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1600&auto=format&fit=crop";
@@ -53,7 +63,7 @@ function Projects({ profile }) {
 
   return (
     <section id="projects" className="min-h-screen py-20 relative overflow-hidden">
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}
         <div className="mb-10 flex items-center justify-between mt-16 px-2 sm:px-10 flex-wrap gap-4">
           <h2
@@ -115,7 +125,7 @@ function Projects({ profile }) {
                 data-aos="fade-up"
                 data-aos-delay={index * 80}
                 onClick={() => setSelectedProject(project)}
-                className="group relative h-[350px] w-full rounded-2xl overflow-hidden shadow-xl cursor-pointer bg-white dark:bg-[#2a2a2a] border border-transparent hover:border-[#1985A1]/30 transition-all duration-300"
+                className="group relative h-[350px] w-full rounded-2xl overflow-hidden shadow-xl cursor-pointer bg-white dark:bg-[#2a2a2a]   transition-all duration-300"
               >
                 {/* Image */}
                 <img
@@ -159,6 +169,7 @@ function Projects({ profile }) {
           FALLBACK_IMG={FALLBACK_IMG}
           setSelectedProject={setSelectedProject}
           selectedProject={selectedProject}
+          descriptionText={descriptionText}
         />
       )}
     </section>

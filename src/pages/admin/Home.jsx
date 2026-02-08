@@ -6,6 +6,8 @@ import RowSkeleton from "../../components/admin/RowSkeleton";
 
 import { getViewersAdmin, getMessagesAdmin} from "../../api/admin";
 import { getBlogs } from "../../api/apis"; 
+import { getLang, pickLang } from "../../api/mainPage";
+import Card from "../../components/admin/Card";
 // <-- pathni o'zingdagi api.js joyiga mosla
 
 function formatDate(iso) {
@@ -33,6 +35,10 @@ function Home() {
   const [messages, setMessages] = useState([]);
 
   const token = localStorage.getItem("admin_token");
+
+  const lang=useMemo(()=>getLang(),[])
+
+
 
   const fetchAll = async () => {
     setLoading(true);
@@ -226,8 +232,11 @@ function Home() {
                 ) : blogs.length === 0 ? (
                   <EmptyText text="Blog topilmadi (endpointni tekshir)." />
                 ) : (
-                  blogs.slice(0, 3).map((b) => (
-                    <button
+                  blogs.slice(0, 3).map((b) => {
+                    const titleText = pickLang(b?.title, lang) || "Untitled";
+                
+              
+                    return (   <button
                       key={b._id || b.id || b.slug || b.title}
                       onClick={() => navigate(`/admin/blog`)}
                       className="
@@ -240,7 +249,7 @@ function Home() {
                     >
                       <div className="flex items-center justify-between gap-3">
                         <p className="font-semibold text-[#46494C] dark:text-[#DCDCDD] line-clamp-1">
-                          {b.title || "Untitled"}
+                          {titleText || "Untitled"}
                         </p>
                         <span className="text-xs text-[#1985A1] font-bold">
                           {b.status || "published"}
@@ -249,8 +258,8 @@ function Home() {
                       <p className="text-xs text-[#4C5C68] dark:text-white/60 mt-1">
                         {formatDate(b.createdAt || b.date)}
                       </p>
-                    </button>
-                  ))
+                    </button>)
+                  })
                 )}
               </div>
             </Card>
@@ -304,21 +313,6 @@ function Home() {
 }
 
 
-function Card({ children, className = "" }) {
-    return (
-      <div
-        className={`
-          rounded-3xl p-4
-          bg-white/70 dark:bg-white/5
-          border border-black/10 dark:border-white/10
-          backdrop-blur-xl
-          ${className}
-        `}
-      >
-        {children}
-      </div>
-    );
-  }
   function CardHeader({ title, subtitle, actionText, onAction }) {
     return (
       <div className="flex items-start justify-between gap-3 mb-3">

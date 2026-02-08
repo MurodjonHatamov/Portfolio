@@ -8,7 +8,13 @@ import {
   FaImage,
 } from "react-icons/fa";
 
-function ModalProject({ selectedProject, setSelectedProject, FALLBACK_IMG }) {
+function ModalProject({ selectedProject, setSelectedProject, FALLBACK_IMG,descriptionText }) {
+
+// console.log(descriptionText,selectedProject.description
+
+// );
+
+
   // ✅ photos safe (max 3)
   const photos = useMemo(() => {
     const arr = Array.isArray(selectedProject?.photos) ? selectedProject.photos : [];
@@ -85,7 +91,7 @@ function ModalProject({ selectedProject, setSelectedProject, FALLBACK_IMG }) {
             <div className="relative w-full aspect-video overflow-hidden">
               <img
                 key={activeImage}
-                src={activeImage}
+                src={activeImage ? activeImage : FALLBACK_IMG}
                 alt={selectedProject?.project_name || "Project"}
                 className="
                   absolute inset-0 w-full h-full
@@ -156,7 +162,7 @@ function ModalProject({ selectedProject, setSelectedProject, FALLBACK_IMG }) {
 
             {/* Description */}
             <p className="text-[#4C5C68] dark:text-white/70 text-base leading-relaxed">
-              {selectedProject?.description || "Description mavjud emas."}
+              {descriptionText || "Description mavjud emas."}
             </p>
 
             {/* Tech */}

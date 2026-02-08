@@ -23,7 +23,6 @@ export const getCvBlob = () => request("/mainpage/cv");
 
 // Bu asosan tilni tanlash uchun mo'ljallangan yordamchi funksiya bo'lib, u berilgan obyektdan (uz, en, ru) tilga mos keladigan qiymatni qaytaradi. Agar obyekt string bo'lsa, uni to'g'ridan-to'g'ri qaytaradi. Agar obyektda tilga mos keladigan qiymat topilmasa, u uz, en, ru tillaridan birini tekshiradi va topilmagan taqdirda "—" belgisi bilan almashtiradi.
 export function pickLang(obj, lang) {
-  // obj: { uz, en, ru } yoki string
   if (!obj) return "—";
   if (typeof obj === "string") return obj;
   return obj?.[lang] || obj?.uz || obj?.en || obj?.ru || "—";

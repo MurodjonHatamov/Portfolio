@@ -59,3 +59,53 @@ export async function getViewersAdmin(token) {
   }
   
 
+
+
+
+// Bu barcha api lar
+  function makeAuthHeaders(token) {
+    const h = { accept: "*/*" };
+    if (token) h.Authorization = `Bearer ${token}`;
+    return h;
+  }
+  
+  export async function getProjectsAdmin(token) {
+    const res = await fetch(`${BASE_URL}/projects`, {
+      method: "GET",
+      headers: makeAuthHeaders(token),
+    });
+    if (!res.ok) throw new Error("Projects olishda xatolik");
+    return res.json();
+  }
+  
+  export async function createProjectAdmin(token, formData) {
+    const res = await fetch(`${BASE_URL}/projects`, {
+      method: "POST",
+      headers: makeAuthHeaders(token), // ⚠️ Content-Type qo‘ymaymiz (FormData o‘zi qo‘yadi)
+      body: formData,
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.message || "Project qo‘shishda xatolik");
+    return data;
+  }
+  
+  export async function updateProjectAdmin(token, id, formData) {
+    const res = await fetch(`${BASE_URL}/projects/${id}`, {
+      method: "PATCH",
+      headers: makeAuthHeaders(token),
+      body: formData,
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.message || "Project tahrirlashda xatolik");
+    return data;
+  }
+  
+  export async function deleteProjectAdmin(token, id) {
+    const res = await fetch(`${BASE_URL}/projects/${id}`, {
+      method: "DELETE",
+      headers: makeAuthHeaders(token),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.message || "Project o‘chirishda xatolik");
+    return data;
+  }

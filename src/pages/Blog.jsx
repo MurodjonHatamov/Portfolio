@@ -2,12 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBlogs } from "../api/apis";
 import { FaCalendarAlt, FaEye } from "react-icons/fa";
+import { getLang, pickLang } from "../api/mainPage";
 
 function Blog() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+
+const lang =useMemo (()=>getLang(),[])
 
   useEffect(() => {
     let alive = true;
@@ -19,8 +22,6 @@ function Blog() {
         const data = await getBlogs();
         if (!alive) return;
         setPosts(Array.isArray(data) ? data : []);
-        console.log(data);
-        
       } catch (e) {
         if (!alive) return;
         setErr(e?.message || "Xatolik yuz berdi");
@@ -41,31 +42,25 @@ function Blog() {
     return words.slice(0, limit).join(" ") + " ...";
   };
 
-  // ✅ o‘qish vaqtini hisoblash (200 wpm)
-  const calcReadTime = (text = "", wpm = 200) => {
-    const words = String(text).trim().split(/\s+/).filter(Boolean).length;
-    const minutes = Math.max(1, Math.ceil(words / wpm));
-    return `${minutes} min read`;
-  };
 
 
-
+  // ✅ tilga moslab normalize qilamiz
   const normalized = useMemo(() => {
     return posts.map((p) => {
-      const title = p?.title || "Untitled";
-      const desc = p?.description || "";
-      const fullText = `${title} ${desc}`;
+      const titleText = pickLang(p?.title, lang) || "Untitled";
+      const descText = pickLang(p?.description, lang) || "";
+
+      const fullText = `${titleText} ${descText}`;
+
       return {
         _id: p?._id,
-        title,
-        description: desc,
-        readTime: calcReadTime(fullText),
-        // agar keyin backend "createdAt" qo'shsa shu ishlaydi
+        title: titleText,
+        description: descText,
         date: p?.createdAt ? p.createdAt : new Date().toISOString(),
-        views:p?.views
+        views: p?.views ?? 0,
       };
     });
-  }, [posts]);
+  }, [posts, lang]);
 
   return (
     <section id="blog" className="min-h-screen px-4 sm:px-6 lg:px-8 pt-24 pb-20">
@@ -118,9 +113,6 @@ function Blog() {
                   active:scale-[0.99]
                 "
               >
-            
-
-                {/* Title (preview) */}
                 <h2
                   className="
                     text-2xl sm:text-3xl font-semibold
@@ -128,31 +120,31 @@ function Blog() {
                     group-hover:text-[#1985A1]
                     transition-colors
                     line-clamp-1
-                    
                   "
                 >
                   {previewWords(post.title, 8)}
                 </h2>
 
-                {/* Desc (5-6 words) + Read more */}
-                <p className="mt-3    line-clamp-1 text-[#4C5C68] dark:text-white/65 leading-relaxed">
-                  {previewWords(post.description,12)}
-               
+                <p className="mt-3 line-clamp-1 text-[#4C5C68] dark:text-white/65 leading-relaxed">
+                  {previewWords(post.description, 12)}
                 </p>
-           <div className="flex items-center justify-between">
-           <span className=" text-[#1985A1] font-semibold block mt-1">
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[#1985A1] font-semibold block mt-1">
                     Read more →
                   </span>
 
-<div className="flex items-center gap-2">
-<span className=" text-[#C5C3C6] flex items-center gap-1 text-[15px]"><FaCalendarAlt />{ new Date(post.date).toLocaleDateString("uz-UZ")}</span>
-<span className="text-[#C5C3C6] flex items-center gap-1 text-[15px]">
-<FaEye />
-{post.views}
-</span>
-</div>
-
-           </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#C5C3C6] flex items-center gap-1 text-[15px]">
+                      <FaCalendarAlt />
+                      {new Date(post.date).toLocaleDateString("uz-UZ")}
+                    </span>
+                    <span className="text-[#C5C3C6] flex items-center gap-1 text-[15px]">
+                      <FaEye />
+                      {post.views}
+                    </span>
+                  </div>
+                </div>
               </article>
             ))}
           </div>

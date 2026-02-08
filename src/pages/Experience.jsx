@@ -3,6 +3,7 @@ import { FaBriefcase, FaCalendarAlt } from "react-icons/fa";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { getExperience } from "../api/apis";
+import { getLang, pickLang } from "../api/mainPage";
 
 function Experience() {
   const [experiences, setExperiences] = useState([]);
@@ -33,7 +34,7 @@ function Experience() {
         const data = await getExperience();
         if (cancelled) return;
         setExperiences(Array.isArray(data) ? data : []);
-        console.log(data);
+    
         
       } catch (e) {
         if (cancelled) return;
@@ -47,6 +48,10 @@ function Experience() {
       cancelled = true;
     };
   }, []);
+
+
+  const lang=useMemo(()=>getLang(),[])
+
 
   // ✅ skeleton helper
   const Sk = ({ className = "" }) => (
@@ -139,6 +144,11 @@ function Experience() {
             !error &&
             experiences.map((exp, index) => {
               const isEven = index % 2 === 0;
+              
+  const descriptionText = pickLang(exp?.description, lang);
+  const roleText = pickLang(exp?.role, lang);
+  // const companyText = pickLang(exp?.company, lang);
+
               return (
                 <div
                   key={exp?._id || index}
@@ -179,7 +189,7 @@ function Experience() {
 
                       {/* Role */}
                       <h3 className="text-2xl font-bold text-[#46494C] dark:text-white mb-1 group-hover:text-[#1985A1] transition-colors">
-                        {exp?.role || "—"}
+                        {roleText || "—"}
                       </h3>
 
                       {/* Company */}
@@ -190,7 +200,7 @@ function Experience() {
 
                       {/* Description */}
                       <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        {exp?.description || "—"}
+                        {descriptionText|| "—"}
                       </p>
                     </div>
                   </div>

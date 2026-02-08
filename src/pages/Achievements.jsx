@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { FaExternalLinkAlt, FaCalendarAlt } from "react-icons/fa";
 import { getAchievements } from "../api/apis";
+import { getLang, pickLang } from "../api/mainPage";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop";
@@ -41,6 +42,11 @@ function Achievements() {
     return () => (cancelled = true);
   }, []);
 
+
+
+  const lang =useMemo(()=>getLang(),[])
+
+  
   return (
     <section
       id="achievements"
@@ -70,8 +76,12 @@ function Achievements() {
 
           {/* DATA */}
           {!loading &&
-            data.map((item, index) => (
-              <a
+            data.map((item, index) => {
+      
+              const descriptionText=pickLang(item.description,lang)
+              const nameText=pickLang(item.name,lang)
+              return (
+                <a
                 key={item._id}
                 href={item.url}
                 target="_blank"
@@ -108,14 +118,14 @@ function Achievements() {
                   {/* TITLE */}
                   {item.name && (
                     <h3 className="text-2xl font-bold text-white leading-snug mb-2">
-                      {item.name}
+                      {nameText}
                     </h3>
                   )}
 
                   {/* DESCRIPTION */}
                   {item.description && (
                     <p className="text-base text-white/80 line-clamp-2">
-                      {item.description}
+                      {descriptionText}
                     </p>
                   )}
 
@@ -125,7 +135,8 @@ function Achievements() {
                   </div>
                 </div>
               </a>
-            ))}
+              )
+            })}
         </div>
       </div>
     </section>
