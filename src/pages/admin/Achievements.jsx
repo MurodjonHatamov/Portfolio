@@ -1,7 +1,6 @@
-// src/pages/admin/Experience.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { FiPlus, FiRefreshCw, FiEdit2, FiTrash2, FiExternalLink } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { FiPlus, FiRefreshCw, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 import Card from "../../components/admin/Card";
 import DeleteConfirm from "../../components/admin/DeleteConfirm";
@@ -12,34 +11,32 @@ import Sk from "../../components/Sk";
 
 import { getLang, pickLang } from "../../api/mainPage";
 import {
-  getExperienceAdmin,
-  createExperienceAdmin,
-  updateExperienceAdmin,
-  deleteExperienceAdmin,
+  getAchievementsAdmin,
+  createAchievementAdmin,
+  updateAchievementAdmin,
+  deleteAchievementAdmin,
 } from "../../api/admin";
 
-// helpers
+const FALLBACK_IMG = "https://via.placeholder.com/200x140?text=No+Image";
+
 function formatDate(iso) {
   if (!iso) return "—";
   try {
-    return new Date(iso).toLocaleDateString("uz-UZ", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
+    return new Date(iso).toLocaleDateString("uz-UZ", { year: "numeric", month: "2-digit", day: "2-digit" });
   } catch {
-    return iso;
+    return String(iso);
   }
 }
 
-function clampText(s = "", n = 90) {
-  const str = String(s ?? "");
+function clampText(s = "", n = 80) {
+  const str = String(s || "");
   return str.length > n ? str.slice(0, n) + "…" : str;
 }
 
-export default function Experience() {
+export default function Achievements() {
   const navigate = useNavigate();
   const token = localStorage.getItem("admin_token");
+  const lang = useMemo(() => getLang(), []);
 
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -53,56 +50,31 @@ export default function Experience() {
 
   const [confirmDel, setConfirmDel] = useState(null);
 
-  const lang = useMemo(() => getLang(), []);
-
-  // form
   const [form, setForm] = useState({
-    company: "",
-    location: "",
-    from: "",
-    to: "",
-    role_uz: "",
-    role_ru: "",
-    role_en: "",
+    name_uz: "",
+    name_ru: "",
+    name_en: "",
     desc_uz: "",
     desc_ru: "",
     desc_en: "",
+    url: "",
+    date: "",
+    photo: null, // single file
   });
 
   const resetForm = () => {
     setForm({
-      company: "",
-      location: "",
-      from: "",
-      to: "",
-      role_uz: "",
-      role_ru: "",
-      role_en: "",
+      name_uz: "",
+      name_ru: "",
+      name_en: "",
       desc_uz: "",
       desc_ru: "",
       desc_en: "",
+      url: "",
+      date: "",
+      photo: null,
     });
   };
-
-  const fetchAll = async () => {
-    if (!token) return navigate("/admin/login");
-
-    setLoading(true);
-    setErr("");
-    try {
-      const data = await getExperienceAdmin(token);
-      setRows(Array.isArray(data) ? data : []);
-    } catch (e) {
-      setErr(e?.message || "Xatolik yuz berdi");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const openCreate = () => {
     setMode("create");
@@ -111,46 +83,55 @@ export default function Experience() {
     setOpenForm(true);
   };
 
-  const openEdit = (exp) => {
+  const openEdit = (a) => {
     setMode("edit");
-    setEditing(exp);
+    setEditing(a);
 
-    // role/description ba’zan string bo‘lib kelishi mumkin (old data)
-    const r = exp?.role;
-    const d = exp?.description;
-
-    const role_uz = typeof r === "object" ? (r?.uz || "") : String(r || "");
-    const role_ru = typeof r === "object" ? (r?.ru || "") : "";
-    const role_en = typeof r === "object" ? (r?.en || "") : "";
-
-    const desc_uz = typeof d === "object" ? (d?.uz || "") : String(d || "");
-    const desc_ru = typeof d === "object" ? (d?.ru || "") : "";
-    const desc_en = typeof d === "object" ? (d?.en || "") : "";
+    const n = a?.name;
+    const d = a?.description;
 
     setForm({
-      company: exp?.company || "",
-      location: exp?.location || "",
-      from: (exp?.from || "").slice(0, 10),
-      to: (exp?.to || "").slice(0, 10),
-      role_uz,
-      role_ru,
-      role_en,
-      desc_uz,
-      desc_ru,
-      desc_en,
+      name_uz: typeof n === "object" ? (n?.uz || "") : String(n || ""),
+      name_ru: typeof n === "object" ? (n?.ru || "") : "",
+      name_en: typeof n === "object" ? (n?.en || "") : "",
+
+      desc_uz: typeof d === "object" ? (d?.uz || "") : String(d || ""),
+      desc_ru: typeof d === "object" ? (d?.ru || "") : "",
+      desc_en: typeof d === "object" ? (d?.en || "") : "",
+
+      url: a?.url || "",
+      date: (a?.date || "").slice(0, 10),
+      photo: null, // yangi tanlasa yangilanadi
     });
 
     setOpenForm(true);
   };
 
+  const fetchAll = async () => {
+    setErr("");
+    setLoading(true);
+    try {
+      const data = await getAchievementsAdmin();
+      setRows(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setErr(e?.message || "Achievements olishda xatolik");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAll();
+  }, []);
+
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
     if (!query) return rows;
 
-    return rows.filter((x) => {
-      const roleText = pickLang(x?.role, lang);
-      const descText = pickLang(x?.description, lang);
-      const hay = `${x?.company || ""} ${x?.location || ""} ${roleText} ${descText}`.toLowerCase();
+    return rows.filter((a) => {
+      const nameText = pickLang(a?.name, lang);
+      const descText = pickLang(a?.description, lang);
+      const hay = `${nameText} ${descText} ${a?.url || ""} ${a?.date || ""}`.toLowerCase();
       return hay.includes(query);
     });
   }, [rows, q, lang]);
@@ -159,38 +140,50 @@ export default function Experience() {
     if (!token) return navigate("/admin/login");
 
     // minimal validation
-    if (!form.company.trim()) return setErr("company majburiy");
-    if (!form.from.trim()) return setErr("from majburiy");
-    // to majburiy emas bo‘lishi mumkin (Present). Swaggerda bor, lekin xohlasang bo‘sh qoldir.
-    if (!form.role_uz.trim() && !form.role_en.trim() && !form.role_ru.trim())
-      return setErr("role (kamida bitta til) kerak");
-    if (!form.desc_uz.trim() && !form.desc_en.trim() && !form.desc_ru.trim())
-      return setErr("description (kamida bitta til) kerak");
+    if (!form.name_uz.trim() && !form.name_en.trim() && !form.name_ru.trim()) {
+      return setErr("name (kamida bitta til) majburiy");
+    }
+    if (!form.desc_uz.trim() && !form.desc_en.trim() && !form.desc_ru.trim()) {
+      return setErr("description (kamida bitta til) majburiy");
+    }
+    if (!form.date.trim()) return setErr("date majburiy");
 
     setErr("");
 
-    const payload = {
-      company: form.company.trim(),
-      location: form.location.trim(),
-      from: form.from, // "YYYY-MM-DD"
-      to: form.to || undefined, // bo‘sh bo‘lsa yubormaymiz
-      role: {
-        uz: form.role_uz || "",
-        ru: form.role_ru || "",
-        en: form.role_en || "",
-      },
-      description: {
+    const fd = new FormData();
+
+    // swagger: name va description JSON string bo‘lib ketadi
+    fd.append(
+      "name",
+      JSON.stringify({
+        uz: form.name_uz || "",
+        ru: form.name_ru || "",
+        en: form.name_en || "",
+      })
+    );
+
+    fd.append(
+      "description",
+      JSON.stringify({
         uz: form.desc_uz || "",
         ru: form.desc_ru || "",
         en: form.desc_en || "",
-      },
-    };
+      })
+    );
+
+    if (form.photo) {
+      // swagger: photos (single file) — field nomi "photos"
+      fd.append("photos", form.photo);
+    }
+
+    if (form.url?.trim()) fd.append("url", form.url.trim());
+    fd.append("date", form.date); // "2025-10-15"
 
     try {
       if (mode === "create") {
-        await createExperienceAdmin(token, payload);
+        await createAchievementAdmin(token, fd);
       } else {
-        await updateExperienceAdmin(token, editing?._id, payload);
+        await updateAchievementAdmin(token, editing?._id, fd);
       }
       setOpenForm(false);
       resetForm();
@@ -203,7 +196,7 @@ export default function Experience() {
   const doDelete = async () => {
     if (!confirmDel?._id) return;
     try {
-      await deleteExperienceAdmin(token, confirmDel._id);
+      await deleteAchievementAdmin(token, confirmDel._id);
       setConfirmDel(null);
       await fetchAll();
     } catch (e) {
@@ -218,9 +211,9 @@ export default function Experience() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
-              Experience
+              Achievements
             </h1>
-         
+          
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -249,7 +242,7 @@ export default function Experience() {
               "
             >
               <FiPlus />
-              Add Experience
+              Add
             </button>
           </div>
         </div>
@@ -273,7 +266,7 @@ export default function Experience() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by company / role / description / location..."
+              placeholder="Search by name / description / url..."
               className="w-full bg-transparent outline-none text-[#46494C] dark:text-[#DCDCDD]"
             />
           </div>
@@ -285,12 +278,11 @@ export default function Experience() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-[#4C5C68] dark:text-white/60 bg-black/[0.02] dark:bg-white/[0.03]">
-                  <th className="py-3 px-4">Company</th>
-                  <th className="py-3 px-4">Role</th>
+                  <th className="py-3 px-4 w-20">Img</th>
+                  <th className="py-3 px-4">Name</th>
                   <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4">Location</th>
-                  <th className="py-3 px-4">From</th>
-                  <th className="py-3 px-4">To</th>
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">Url</th>
                   <th className="py-3 px-4 w-28">Action</th>
                 </tr>
               </thead>
@@ -299,64 +291,79 @@ export default function Experience() {
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={i} className="border-t border-black/5 dark:border-white/10">
+                      <td className="py-3 px-4"><Sk className="w-14 h-10 rounded-2xl" /></td>
+                      <td className="py-3 px-4"><Sk className="h-4 w-48 rounded" /></td>
+                      <td className="py-3 px-4"><Sk className="h-4 w-80 rounded" /></td>
+                      <td className="py-3 px-4"><Sk className="h-4 w-24 rounded" /></td>
                       <td className="py-3 px-4"><Sk className="h-4 w-28 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-40 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-72 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-28 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-20 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-20 rounded" /></td>
                       <td className="py-3 px-4"><Sk className="h-8 w-20 rounded-2xl" /></td>
                     </tr>
                   ))
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-10 text-center text-[#4C5C68] dark:text-white/60">
+                    <td colSpan={6} className="py-10 text-center text-[#4C5C68] dark:text-white/60">
                       Hech narsa topilmadi.
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((x) => {
-                    const roleText = pickLang(x?.role, lang);
-                    const descText = pickLang(x?.description, lang);
+                  filtered.map((a) => {
+                    const img = a?.photos || FALLBACK_IMG;
+                    const nameText = pickLang(a?.name, lang);
+                    const descText = pickLang(a?.description, lang);
+
                     return (
-                      <tr key={x._id} className="border-t border-black/5 dark:border-white/10">
+                      <tr key={a._id} className="border-t border-black/5 dark:border-white/10">
                         <td className="py-3 px-4">
-                          <div className="font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
-                            {x?.company || "—"}
+                          <div className="w-14 h-10 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/5">
+                            <img src={img} alt="cert" className="w-full h-full object-cover" />
                           </div>
                         </td>
 
-                        <td className="py-3 px-4 text-[#46494C] dark:text-[#DCDCDD] font-semibold">
-                          {clampText(roleText, 60)}
+                        <td className="py-3 px-4">
+                          <div className="font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
+                            {nameText || "—"}
+                          </div>
+                          <div className="text-xs text-[#4C5C68] dark:text-white/60">
+                            ID: {a?._id}
+                          </div>
                         </td>
 
                         <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {clampText(descText, 100)}
+                          {clampText(descText, 95)}
                         </td>
 
                         <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {x?.location || "—"}
+                          {formatDate(a?.date)}
                         </td>
 
-                        <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {formatDate(x?.from)}
-                        </td>
-
-                        <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {x?.to ? formatDate(x?.to) : "Present"}
+                        <td className="py-3 px-4">
+                          {a?.url ? (
+                            <a
+                              href={a.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-[#1985A1] hover:underline"
+                              title="Open url"
+                            >
+                              <FiExternalLink />
+                              <span className="text-xs font-semibold">Open</span>
+                            </a>
+                          ) : (
+                            <span className="text-[#4C5C68] dark:text-white/60">—</span>
+                          )}
                         </td>
 
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => openEdit(x)}
+                              onClick={() => openEdit(a)}
                               className="p-2 rounded-2xl hover:bg-black/5 dark:hover:bg-white/10 transition active:scale-95"
                               title="Edit"
                             >
                               <FiEdit2 className="text-[#4C5C68] dark:text-white/70" />
                             </button>
                             <button
-                              onClick={() => setConfirmDel(x)}
+                              onClick={() => setConfirmDel(a)}
                               className="p-2 rounded-2xl hover:bg-red-500/10 transition active:scale-95"
                               title="Delete"
                             >
@@ -376,7 +383,7 @@ export default function Experience() {
         {/* Create/Edit Modal */}
         <Modal
           open={openForm}
-          title={mode === "create" ? "Add Experience" : "Edit Experience"}
+          title={mode === "create" ? "Add Achievement" : "Edit Achievement"}
           onClose={() => setOpenForm(false)}
           footer={
             <>
@@ -409,75 +416,93 @@ export default function Experience() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Company *"
-              value={form.company}
-              onChange={(e) => setForm((s) => ({ ...s, company: e.target.value }))}
-              placeholder="payme"
+              label="Name UZ *"
+              value={form.name_uz}
+              onChange={(e) => setForm((s) => ({ ...s, name_uz: e.target.value }))}
+              placeholder="Najot Ta'lim bitiruv sertifikati"
             />
-
             <Input
-              label="Location"
-              value={form.location}
-              onChange={(e) => setForm((s) => ({ ...s, location: e.target.value }))}
-              placeholder="Tashkent..."
-            />
-
-            <Input
-              label="From *"
+              label="Date *"
               type="date"
-              value={form.from}
-              onChange={(e) => setForm((s) => ({ ...s, from: e.target.value }))}
+              value={form.date}
+              onChange={(e) => setForm((s) => ({ ...s, date: e.target.value }))}
             />
 
             <Input
-              label="To (bo‘sh qoldirsa Present)"
-              type="date"
-              value={form.to}
-              onChange={(e) => setForm((s) => ({ ...s, to: e.target.value }))}
-            />
-
-            <Input
-              label="Role UZ *"
-              value={form.role_uz}
-              onChange={(e) => setForm((s) => ({ ...s, role_uz: e.target.value }))}
-              placeholder="Kichik backend dasturchi..."
+              label="Name RU"
+              value={form.name_ru}
+              onChange={(e) => setForm((s) => ({ ...s, name_ru: e.target.value }))}
+              placeholder="Выпускной сертификат..."
             />
             <Input
-              label="Role RU"
-              value={form.role_ru}
-              onChange={(e) => setForm((s) => ({ ...s, role_ru: e.target.value }))}
-              placeholder="Младший..."
-            />
-            <Input
-              label="Role EN"
-              value={form.role_en}
-              onChange={(e) => setForm((s) => ({ ...s, role_en: e.target.value }))}
-              placeholder="Junior..."
+              label="Name EN"
+              value={form.name_en}
+              onChange={(e) => setForm((s) => ({ ...s, name_en: e.target.value }))}
+              placeholder="Graduation certificate..."
             />
 
             <div className="md:col-span-2">
-              <Textarea
-                label="Description UZ *"
-                value={form.desc_uz}
-                onChange={(e) => setForm((s) => ({ ...s, desc_uz: e.target.value }))}
-                placeholder="Uzbekcha..."
+              <Input
+                label="Url"
+                value={form.url}
+                onChange={(e) => setForm((s) => ({ ...s, url: e.target.value }))}
+                placeholder="https://..."
               />
             </div>
+
+            <Textarea
+              label="Description UZ *"
+              value={form.desc_uz}
+              onChange={(e) => setForm((s) => ({ ...s, desc_uz: e.target.value }))}
+              placeholder="Uzbekcha ta’rif..."
+            />
+            <Textarea
+              label="Description RU"
+              value={form.desc_ru}
+              onChange={(e) => setForm((s) => ({ ...s, desc_ru: e.target.value }))}
+              placeholder="Русское описание..."
+            />
+            <Textarea
+              label="Description EN"
+              value={form.desc_en}
+              onChange={(e) => setForm((s) => ({ ...s, desc_en: e.target.value }))}
+              placeholder="English description..."
+            />
+
             <div className="md:col-span-2">
-              <Textarea
-                label="Description RU"
-                value={form.desc_ru}
-                onChange={(e) => setForm((s) => ({ ...s, desc_ru: e.target.value }))}
-                placeholder="Русский..."
-              />
-            </div>
-            <div className="md:col-span-2">
-              <Textarea
-                label="Description EN"
-                value={form.desc_en}
-                onChange={(e) => setForm((s) => ({ ...s, desc_en: e.target.value }))}
-                placeholder="English..."
-              />
+              <label className="block">
+                <span className="block text-xs font-bold text-[#4C5C68] dark:text-white/60 mb-2">
+                  Photo (1 ta) {mode === "create" ? "*" : "(ixtiyoriy)"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setForm((s) => ({ ...s, photo: e.target.files?.[0] || null }))}
+                  className="
+                    w-full px-4 py-3 rounded-2xl
+                    bg-white/70 dark:bg-white/5
+                    border border-black/10 dark:border-white/10
+                    text-[#46494C] dark:text-[#DCDCDD]
+                  "
+                />
+                <p className="mt-2 text-xs text-[#4C5C68] dark:text-white/60">
+                  {form.photo ? `Tanlandi: ${form.photo.name}` : "Hozircha rasm tanlanmadi"}
+                </p>
+              </label>
+
+              {mode === "edit" && editing?.photos ? (
+                <div className="mt-3 flex items-center gap-3">
+                  <img
+                    src={editing.photos || FALLBACK_IMG}
+                    alt="old"
+                    className="w-24 h-16 rounded-2xl object-cover border border-black/10 dark:border-white/10"
+                    loading="lazy"
+                  />
+                  <p className="text-xs text-[#4C5C68] dark:text-white/60">
+                    (Edit’da eski rasm qoladi, yangi tanlasang yangilanadi)
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
         </Modal>
@@ -485,7 +510,7 @@ export default function Experience() {
         {/* Delete confirm */}
         <DeleteConfirm
           open={!!confirmDel}
-          title="Delete experience?"
+          title="Delete achievement?"
           onClose={() => setConfirmDel(null)}
           footer={
             <>
@@ -518,9 +543,9 @@ export default function Experience() {
         >
           <p className="text-sm text-[#4C5C68] dark:text-white/70">
             <span className="font-bold text-[#46494C] dark:text-[#DCDCDD]">
-              {confirmDel?.company}
+              {pickLang(confirmDel?.name, lang) || "Achievement"}
             </span>{" "}
-            tajribasini o‘chirmoqchimisiz? Bu amal qaytarilmaydi.
+            ni o‘chirmoqchimisiz? Bu amal qaytarilmaydi.
           </p>
         </DeleteConfirm>
       </div>

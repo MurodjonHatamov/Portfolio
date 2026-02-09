@@ -109,3 +109,178 @@ export async function getViewersAdmin(token) {
     if (!res.ok) throw new Error(data?.message || "Project o‘chirishda xatolik");
     return data;
   }
+
+
+
+  // Experience
+
+async function request(url, { method = "GET", token, body } = {}) {
+  const headers = { accept: "*/*" };
+
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  // JSON yuborayotgan bo'lsang:
+  if (body !== undefined) headers["Content-Type"] = "application/json";
+
+  const res = await fetch(url, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  // Xatolik bo'lsa ham json/text ni olib ko'ramiz
+  const text = await res.text();
+  let data;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+
+  if (!res.ok) {
+    const msg =
+      (data && (data.message || data.error)) ||
+      `HTTP ${res.status}: ${res.statusText}`;
+    throw new Error(msg);
+  }
+
+  return data;
+}
+
+// ✅ Experience admin API
+export function getExperienceAdmin(token) {
+  return request(`${BASE_URL}/experience`, { token });
+}
+
+export function createExperienceAdmin(token, payload) {
+  return request(`${BASE_URL}/experience`, { method: "POST", token, body: payload });
+}
+
+export function updateExperienceAdmin(token, id, payload) {
+  return request(`${BASE_URL}/experience/${id}`, { method: "PATCH", token, body: payload });
+}
+
+export function deleteExperienceAdmin(token, id) {
+  return request(`${BASE_URL}/experience/${id}`, { method: "DELETE", token });
+}
+
+
+
+//Blog sahifasi uchun
+
+
+// ✅ BLOG ADMIN API (multipart/form-data)
+export function getBlogsAdmin(token) {
+  return request(`${BASE_URL}/blog`, { token }); // GET public ham ishlaydi, token bo'lsa ham zarar yo'q
+}
+
+export function createBlogAdmin(token, formData) {
+  return request(`${BASE_URL}/blog`, { method: "POST", token, body: formData });
+}
+
+export function updateBlogAdmin(token, id, formData) {
+  return request(`${BASE_URL}/blog/${id}`, { method: "PATCH", token, body: formData });
+}
+
+export function deleteBlogAdmin(token, id) {
+  return request(`${BASE_URL}/blog/${id}`, { method: "DELETE", token });
+}
+
+
+
+// Contact uchun
+
+
+// Agar sendagi admin.js ichida request() allaqachon bor bo'lsa,
+// shu blokni qo'shma. Faqat contact funksiyalarini qo'sh.
+
+
+// ✅ CONTACT
+export function getContactsAdmin(token) {
+  return request(`${BASE_URL}/contact`, { token });
+}
+
+export function deleteContactAdmin(token, id) {
+  return request(`${BASE_URL}/contact/${id}`, { method: "DELETE", token });
+}
+
+
+
+
+// Achievements uchun
+
+
+export async function getAchievementsAdmin() {
+  const res = await fetch(`${BASE_URL}/achievements`, { headers: { accept: "*/*" } });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : [];
+  if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
+  return data;
+}
+
+export async function createAchievementAdmin(token, formData) {
+  const res = await fetch(`${BASE_URL}/achievements`, {
+    method: "POST",
+    headers: { accept: "*/*", Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
+  return data;
+}
+
+export async function updateAchievementAdmin(token, id, formData) {
+  const res = await fetch(`${BASE_URL}/achievements/${id}`, {
+    method: "PATCH",
+    headers: { accept: "*/*", Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
+  return data;
+}
+
+export async function deleteAchievementAdmin(token, id) {
+  const res = await fetch(`${BASE_URL}/achievements/${id}`, {
+    method: "DELETE",
+    headers: { accept: "*/*", Authorization: `Bearer ${token}` },
+  });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
+  return data;
+}
+
+
+
+
+// Main page uchun yani profiel uchun 
+
+
+// ✅ MAINPAGE (PROFILE)
+export async function getMainpage() {
+  const res = await fetch(`${BASE_URL}/mainpage`, { headers: { accept: "*/*" } });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : [];
+  if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
+  return data;
+}
+
+export async function updateMainpage(token, id, formData) {
+  const res = await fetch(`${BASE_URL}/mainpage/${id}`, {
+    method: "PATCH",
+    headers: { accept: "*/*", Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
+  return data;
+}
+
+// (ixtiyoriy) CV linkini olish uchun
+export function getMainpageCvUrl() {
+  return `${BASE_URL}/mainpage/cv`;
+}

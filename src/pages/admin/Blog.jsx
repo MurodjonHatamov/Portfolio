@@ -1,43 +1,32 @@
-// src/pages/admin/Experience.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { FiPlus, FiRefreshCw, FiEdit2, FiTrash2, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { FiPlus, FiRefreshCw, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 import Card from "../../components/admin/Card";
-import DeleteConfirm from "../../components/admin/DeleteConfirm";
 import Modal from "../../components/admin/Modal";
-import Input from "../../components/Input";
+import DeleteConfirm from "../../components/admin/DeleteConfirm";
+import Input from "../../components/Input"; // sendagi yo'l
 import Textarea from "../../components/admin/Textarea";
 import Sk from "../../components/Sk";
 
+import { getBlogsAdmin, createBlogAdmin, updateBlogAdmin, deleteBlogAdmin } from "../../api/admin";
 import { getLang, pickLang } from "../../api/mainPage";
-import {
-  getExperienceAdmin,
-  createExperienceAdmin,
-  updateExperienceAdmin,
-  deleteExperienceAdmin,
-} from "../../api/admin";
 
-// helpers
 function formatDate(iso) {
   if (!iso) return "—";
   try {
-    return new Date(iso).toLocaleDateString("uz-UZ", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
+    return new Date(iso).toLocaleDateString("uz-UZ", { year: "numeric", month: "2-digit", day: "2-digit" });
   } catch {
     return iso;
   }
 }
 
-function clampText(s = "", n = 90) {
-  const str = String(s ?? "");
+function clampText(s = "", n = 70) {
+  const str = String(s || "");
   return str.length > n ? str.slice(0, n) + "…" : str;
 }
 
-export default function Experience() {
+export default function Blog() {
   const navigate = useNavigate();
   const token = localStorage.getItem("admin_token");
 
@@ -55,42 +44,73 @@ export default function Experience() {
 
   const lang = useMemo(() => getLang(), []);
 
-  // form
   const [form, setForm] = useState({
-    company: "",
-    location: "",
-    from: "",
-    to: "",
-    role_uz: "",
-    role_ru: "",
-    role_en: "",
+    title_uz: "",
+    title_ru: "",
+    title_en: "",
     desc_uz: "",
     desc_ru: "",
     desc_en: "",
+    photos: [],
   });
 
   const resetForm = () => {
     setForm({
-      company: "",
-      location: "",
-      from: "",
-      to: "",
-      role_uz: "",
-      role_ru: "",
-      role_en: "",
+      title_uz: "",
+      title_ru: "",
+      title_en: "",
       desc_uz: "",
       desc_ru: "",
       desc_en: "",
+      photos: [],
     });
   };
 
-  const fetchAll = async () => {
-    if (!token) return navigate("/admin/login");
+  const openCreate = () => {
+    setMode("create");
+    setEditing(null);
+    resetForm();
+    setOpenForm(true);
+  };
 
+  const openEdit = (p) => {
+    setMode("edit");
+    setEditing(p);
+
+    // title/description ba'zida string bo'lib qolgan datalar bor (senda GET/blog ichida bor)
+    const t = p?.title;
+    const d = p?.description;
+
+    const title_uz = typeof t === "object" ? (t?.uz || "") : String(t || "");
+    const title_ru = typeof t === "object" ? (t?.ru || "") : "";
+    const title_en = typeof t === "object" ? (t?.en || "") : "";
+
+    const desc_uz = typeof d === "object" ? (d?.uz || "") : String(d || "");
+    const desc_ru = typeof d === "object" ? (d?.ru || "") : "";
+    const desc_en = typeof d === "object" ? (d?.en || "") : "";
+
+    setForm({
+      title_uz,
+      title_ru,
+      title_en,
+      desc_uz,
+      desc_ru,
+      desc_en,
+      photos: [],
+    });
+
+    setOpenForm(true);
+  };
+
+  const fetchAll = async () => {
+    if (!token) {
+      navigate("/admin/login");
+      return;
+    }
     setLoading(true);
     setErr("");
     try {
-      const data = await getExperienceAdmin(token);
+      const data = await getBlogsAdmin(token);
       setRows(Array.isArray(data) ? data : []);
     } catch (e) {
       setErr(e?.message || "Xatolik yuz berdi");
@@ -104,53 +124,14 @@ export default function Experience() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const openCreate = () => {
-    setMode("create");
-    setEditing(null);
-    resetForm();
-    setOpenForm(true);
-  };
-
-  const openEdit = (exp) => {
-    setMode("edit");
-    setEditing(exp);
-
-    // role/description ba’zan string bo‘lib kelishi mumkin (old data)
-    const r = exp?.role;
-    const d = exp?.description;
-
-    const role_uz = typeof r === "object" ? (r?.uz || "") : String(r || "");
-    const role_ru = typeof r === "object" ? (r?.ru || "") : "";
-    const role_en = typeof r === "object" ? (r?.en || "") : "";
-
-    const desc_uz = typeof d === "object" ? (d?.uz || "") : String(d || "");
-    const desc_ru = typeof d === "object" ? (d?.ru || "") : "";
-    const desc_en = typeof d === "object" ? (d?.en || "") : "";
-
-    setForm({
-      company: exp?.company || "",
-      location: exp?.location || "",
-      from: (exp?.from || "").slice(0, 10),
-      to: (exp?.to || "").slice(0, 10),
-      role_uz,
-      role_ru,
-      role_en,
-      desc_uz,
-      desc_ru,
-      desc_en,
-    });
-
-    setOpenForm(true);
-  };
-
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
     if (!query) return rows;
 
-    return rows.filter((x) => {
-      const roleText = pickLang(x?.role, lang);
-      const descText = pickLang(x?.description, lang);
-      const hay = `${x?.company || ""} ${x?.location || ""} ${roleText} ${descText}`.toLowerCase();
+    return rows.filter((p) => {
+      const title = pickLang(p?.title, lang);
+      const desc = pickLang(p?.description, lang);
+      const hay = `${title} ${desc}`.toLowerCase();
       return hay.includes(query);
     });
   }, [rows, q, lang]);
@@ -158,39 +139,33 @@ export default function Experience() {
   const submit = async () => {
     if (!token) return navigate("/admin/login");
 
-    // minimal validation
-    if (!form.company.trim()) return setErr("company majburiy");
-    if (!form.from.trim()) return setErr("from majburiy");
-    // to majburiy emas bo‘lishi mumkin (Present). Swaggerda bor, lekin xohlasang bo‘sh qoldir.
-    if (!form.role_uz.trim() && !form.role_en.trim() && !form.role_ru.trim())
-      return setErr("role (kamida bitta til) kerak");
+    // ✅ validation
+    if (!form.title_uz.trim() && !form.title_en.trim() && !form.title_ru.trim())
+      return setErr("Title (kamida bitta til) kerak");
     if (!form.desc_uz.trim() && !form.desc_en.trim() && !form.desc_ru.trim())
-      return setErr("description (kamida bitta til) kerak");
+      return setErr("Description (kamida bitta til) kerak");
+
+    if (form.photos?.length > 2) return setErr("Photos 0-2 tagacha bo‘lishi kerak");
 
     setErr("");
 
-    const payload = {
-      company: form.company.trim(),
-      location: form.location.trim(),
-      from: form.from, // "YYYY-MM-DD"
-      to: form.to || undefined, // bo‘sh bo‘lsa yubormaymiz
-      role: {
-        uz: form.role_uz || "",
-        ru: form.role_ru || "",
-        en: form.role_en || "",
-      },
-      description: {
-        uz: form.desc_uz || "",
-        ru: form.desc_ru || "",
-        en: form.desc_en || "",
-      },
-    };
+    const fd = new FormData();
+
+    // photos (0-2)
+    Array.from(form.photos || []).forEach((file) => fd.append("photos", file));
+
+    const titleObj = { uz: form.title_uz || "", ru: form.title_ru || "", en: form.title_en || "" };
+    const descObj = { uz: form.desc_uz || "", ru: form.desc_ru || "", en: form.desc_en || "" };
+
+    // Swagger’da JSON string bo'lib ketayapti
+    fd.append("title", JSON.stringify(titleObj));
+    fd.append("description", JSON.stringify(descObj));
 
     try {
       if (mode === "create") {
-        await createExperienceAdmin(token, payload);
+        await createBlogAdmin(token, fd);
       } else {
-        await updateExperienceAdmin(token, editing?._id, payload);
+        await updateBlogAdmin(token, editing?._id, fd);
       }
       setOpenForm(false);
       resetForm();
@@ -203,7 +178,7 @@ export default function Experience() {
   const doDelete = async () => {
     if (!confirmDel?._id) return;
     try {
-      await deleteExperienceAdmin(token, confirmDel._id);
+      await deleteBlogAdmin(token, confirmDel._id);
       setConfirmDel(null);
       await fetchAll();
     } catch (e) {
@@ -218,9 +193,9 @@ export default function Experience() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
-              Experience
+              Blog Posts
             </h1>
-         
+        
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -249,7 +224,7 @@ export default function Experience() {
               "
             >
               <FiPlus />
-              Add Experience
+              Add Post
             </button>
           </div>
         </div>
@@ -263,17 +238,11 @@ export default function Experience() {
 
         {/* Search */}
         <div className="mt-6 flex flex-col md:flex-row gap-3 md:items-center">
-          <div
-            className="
-              flex-1 px-4 py-3 rounded-2xl
-              bg-white/70 dark:bg-white/5
-              border border-black/10 dark:border-white/10
-            "
-          >
+          <div className="flex-1 px-4 py-3 rounded-2xl bg-white/70 dark:bg-white/5 border border-black/10 dark:border-white/10">
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by company / role / description / location..."
+              placeholder="Search by title / description..."
               className="w-full bg-transparent outline-none text-[#46494C] dark:text-[#DCDCDD]"
             />
           </div>
@@ -285,78 +254,94 @@ export default function Experience() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-[#4C5C68] dark:text-white/60 bg-black/[0.02] dark:bg-white/[0.03]">
-                  <th className="py-3 px-4">Company</th>
-                  <th className="py-3 px-4">Role</th>
+                  <th className="py-3 px-4 w-16">Img</th>
+                  <th className="py-3 px-4">Title</th>
                   <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4">Location</th>
-                  <th className="py-3 px-4">From</th>
-                  <th className="py-3 px-4">To</th>
+                  <th className="py-3 px-4 w-24">Views</th>
+                  <th className="py-3 px-4 w-32">Created</th>
                   <th className="py-3 px-4 w-28">Action</th>
                 </tr>
               </thead>
 
               <tbody>
                 {loading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
+                  Array.from({ length: 4 }).map((_, i) => (
                     <tr key={i} className="border-t border-black/5 dark:border-white/10">
-                      <td className="py-3 px-4"><Sk className="h-4 w-28 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-40 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-72 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-28 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-20 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-4 w-20 rounded" /></td>
-                      <td className="py-3 px-4"><Sk className="h-8 w-20 rounded-2xl" /></td>
+                      <td className="py-3 px-4">
+                        <div className="w-12 h-12 rounded-2xl bg-black/10 dark:bg-white/10 animate-pulse" />
+                      </td>
+                      <td className="py-3 px-4">
+                        <Sk className="h-4 w-52 rounded" />
+                      </td>
+                      <td className="py-3 px-4">
+                        <Sk className="h-4 w-80 rounded" />
+                      </td>
+                      <td className="py-3 px-4">
+                        <Sk className="h-4 w-10 rounded" />
+                      </td>
+                      <td className="py-3 px-4">
+                        <Sk className="h-4 w-24 rounded" />
+                      </td>
+                      <td className="py-3 px-4">
+                        <Sk className="h-8 w-20 rounded-2xl" />
+                      </td>
                     </tr>
                   ))
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-10 text-center text-[#4C5C68] dark:text-white/60">
+                    <td colSpan={6} className="py-10 text-center text-[#4C5C68] dark:text-white/60">
                       Hech narsa topilmadi.
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((x) => {
-                    const roleText = pickLang(x?.role, lang);
-                    const descText = pickLang(x?.description, lang);
+                  filtered.map((p) => {
+                    const cover = p?.photos?.[0];
+                    const titleText = pickLang(p?.title, lang);
+                    const descText = pickLang(p?.description, lang);
+
                     return (
-                      <tr key={x._id} className="border-t border-black/5 dark:border-white/10">
+                      <tr key={p._id} className="border-t border-black/5 dark:border-white/10">
                         <td className="py-3 px-4">
-                          <div className="font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
-                            {x?.company || "—"}
+                          <div className="w-12 h-12 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/5">
+                            {cover ? (
+                              <img src={cover} alt="cover" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-xs font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
+                                {String(titleText || "B")[0].toUpperCase()}
+                              </div>
+                            )}
                           </div>
                         </td>
 
-                        <td className="py-3 px-4 text-[#46494C] dark:text-[#DCDCDD] font-semibold">
-                          {clampText(roleText, 60)}
+                        <td className="py-3 px-4">
+                          <div className="font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
+                            {clampText(titleText, 60)}
+                          </div>
                         </td>
 
                         <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {clampText(descText, 100)}
+                          {clampText(descText, 90)}
                         </td>
 
                         <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {x?.location || "—"}
+                          {p?.views ?? 0}
                         </td>
 
                         <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {formatDate(x?.from)}
-                        </td>
-
-                        <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
-                          {x?.to ? formatDate(x?.to) : "Present"}
+                          {formatDate(p?.createdAt)}
                         </td>
 
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => openEdit(x)}
+                              onClick={() => openEdit(p)}
                               className="p-2 rounded-2xl hover:bg-black/5 dark:hover:bg-white/10 transition active:scale-95"
                               title="Edit"
                             >
                               <FiEdit2 className="text-[#4C5C68] dark:text-white/70" />
                             </button>
                             <button
-                              onClick={() => setConfirmDel(x)}
+                              onClick={() => setConfirmDel(p)}
                               className="p-2 rounded-2xl hover:bg-red-500/10 transition active:scale-95"
                               title="Delete"
                             >
@@ -376,7 +361,7 @@ export default function Experience() {
         {/* Create/Edit Modal */}
         <Modal
           open={openForm}
-          title={mode === "create" ? "Add Experience" : "Edit Experience"}
+          title={mode === "create" ? "Add Blog Post" : "Edit Blog Post"}
           onClose={() => setOpenForm(false)}
           footer={
             <>
@@ -409,75 +394,81 @@ export default function Experience() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Company *"
-              value={form.company}
-              onChange={(e) => setForm((s) => ({ ...s, company: e.target.value }))}
-              placeholder="payme"
+              label="Title UZ *"
+              value={form.title_uz}
+              onChange={(e) => setForm((s) => ({ ...s, title_uz: e.target.value }))}
+              placeholder="Blog sarlavhasi..."
+            />
+            <Input
+              label="Title RU"
+              value={form.title_ru}
+              onChange={(e) => setForm((s) => ({ ...s, title_ru: e.target.value }))}
+              placeholder="Заголовок..."
+            />
+            <Input
+              label="Title EN"
+              value={form.title_en}
+              onChange={(e) => setForm((s) => ({ ...s, title_en: e.target.value }))}
+              placeholder="Blog title..."
             />
 
-            <Input
-              label="Location"
-              value={form.location}
-              onChange={(e) => setForm((s) => ({ ...s, location: e.target.value }))}
-              placeholder="Tashkent..."
+            <Textarea
+              label="Description UZ *"
+              value={form.desc_uz}
+              onChange={(e) => setForm((s) => ({ ...s, desc_uz: e.target.value }))}
+              placeholder="Blog matni..."
             />
-
-            <Input
-              label="From *"
-              type="date"
-              value={form.from}
-              onChange={(e) => setForm((s) => ({ ...s, from: e.target.value }))}
+            <Textarea
+              label="Description RU"
+              value={form.desc_ru}
+              onChange={(e) => setForm((s) => ({ ...s, desc_ru: e.target.value }))}
+              placeholder="Содержание..."
             />
-
-            <Input
-              label="To (bo‘sh qoldirsa Present)"
-              type="date"
-              value={form.to}
-              onChange={(e) => setForm((s) => ({ ...s, to: e.target.value }))}
-            />
-
-            <Input
-              label="Role UZ *"
-              value={form.role_uz}
-              onChange={(e) => setForm((s) => ({ ...s, role_uz: e.target.value }))}
-              placeholder="Kichik backend dasturchi..."
-            />
-            <Input
-              label="Role RU"
-              value={form.role_ru}
-              onChange={(e) => setForm((s) => ({ ...s, role_ru: e.target.value }))}
-              placeholder="Младший..."
-            />
-            <Input
-              label="Role EN"
-              value={form.role_en}
-              onChange={(e) => setForm((s) => ({ ...s, role_en: e.target.value }))}
-              placeholder="Junior..."
+            <Textarea
+              label="Description EN"
+              value={form.desc_en}
+              onChange={(e) => setForm((s) => ({ ...s, desc_en: e.target.value }))}
+              placeholder="Blog content..."
             />
 
             <div className="md:col-span-2">
-              <Textarea
-                label="Description UZ *"
-                value={form.desc_uz}
-                onChange={(e) => setForm((s) => ({ ...s, desc_uz: e.target.value }))}
-                placeholder="Uzbekcha..."
-              />
-            </div>
-            <div className="md:col-span-2">
-              <Textarea
-                label="Description RU"
-                value={form.desc_ru}
-                onChange={(e) => setForm((s) => ({ ...s, desc_ru: e.target.value }))}
-                placeholder="Русский..."
-              />
-            </div>
-            <div className="md:col-span-2">
-              <Textarea
-                label="Description EN"
-                value={form.desc_en}
-                onChange={(e) => setForm((s) => ({ ...s, desc_en: e.target.value }))}
-                placeholder="English..."
-              />
+              <label className="block">
+                <span className="block text-xs font-bold text-[#4C5C68] dark:text-white/60 mb-2">
+                  Photos (0-2)
+                </span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => setForm((s) => ({ ...s, photos: e.target.files }))}
+                  className="
+                    w-full px-4 py-3 rounded-2xl
+                    bg-white/70 dark:bg-white/5
+                    border border-black/10 dark:border-white/10
+                    text-[#46494C] dark:text-[#DCDCDD]
+                  "
+                />
+                <p className="mt-2 text-xs text-[#4C5C68] dark:text-white/60">
+                  {form.photos?.length ? `${form.photos.length} ta tanlandi` : "Hozircha rasm tanlanmadi"}
+                </p>
+              </label>
+
+              {editing?.photos?.length ? (
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  {editing.photos.slice(0, 2).map((url) => (
+                    <img
+                      key={url}
+                      src={url}
+                      alt="old"
+                      className="w-16 h-16 rounded-2xl object-cover border border-black/10 dark:border-white/10"
+                      loading="lazy"
+                    />
+                  ))}
+                  <p className="text-xs text-[#4C5C68] dark:text-white/60 self-center">
+                    (Edit’da eski rasmlar qoladi, yangi tanlasang yangilanadi)
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
         </Modal>
@@ -485,7 +476,7 @@ export default function Experience() {
         {/* Delete confirm */}
         <DeleteConfirm
           open={!!confirmDel}
-          title="Delete experience?"
+          title="Delete blog post?"
           onClose={() => setConfirmDel(null)}
           footer={
             <>
@@ -518,9 +509,9 @@ export default function Experience() {
         >
           <p className="text-sm text-[#4C5C68] dark:text-white/70">
             <span className="font-bold text-[#46494C] dark:text-[#DCDCDD]">
-              {confirmDel?.company}
+              {clampText(pickLang(confirmDel?.title, lang), 60)}
             </span>{" "}
-            tajribasini o‘chirmoqchimisiz? Bu amal qaytarilmaydi.
+            postni o‘chirmoqchimisiz? Bu amal qaytarilmaydi.
           </p>
         </DeleteConfirm>
       </div>

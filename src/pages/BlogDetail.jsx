@@ -1,7 +1,10 @@
+// BlogDetail.jsx (TO‘LIQ — lang + pickLang + truncate fix + useMemo dependency to‘g‘ri)
+
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getBlogById, getBlogs } from "../api/apis";
 import { FiLink, FiCopy, FiCheck } from "react-icons/fi";
+import { getLang, pickLang } from "../api/mainPage";
 
 const FALLBACK_IMG = "https://via.placeholder.com/1200x600?text=No+Image";
 
@@ -24,12 +27,13 @@ function BlogDetailSkeleton() {
 }
 
 async function copyToClipboard(text) {
+  const safe = String(text ?? "");
   if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(safe);
     return;
   }
   const ta = document.createElement("textarea");
-  ta.value = text;
+  ta.value = safe;
   ta.setAttribute("readonly", "");
   ta.style.position = "fixed";
   ta.style.left = "-9999px";
@@ -41,7 +45,6 @@ async function copyToClipboard(text) {
 
 function pickRandom(arr, n) {
   const a = [...arr];
-  // Fisher-Yates shuffle
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
@@ -49,14 +52,17 @@ function pickRandom(arr, n) {
   return a.slice(0, n);
 }
 
+// ✅ trim error bo‘lmasligi uchun: har doim stringga o‘tkazamiz
 function truncateWords(text = "", limit = 6) {
-  const words = text.trim().split(/\s+/).filter(Boolean);
-  if (words.length <= limit) return text;
+  const safe = String(text ?? "");
+  const words = safe.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= limit) return safe;
   return words.slice(0, limit).join(" ") + "…";
 }
 
 function BlogDetail() {
   const { id } = useParams();
+
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -68,11 +74,20 @@ function BlogDetail() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedPost, setCopiedPost] = useState(false);
 
+  // ✅ lang (agar keyin tilni state bilan qilmoqchi bo‘lsang, bu joyni o‘zgartirasan)
+  const lang = useMemo(() => getLang(), []);
+
+  // ✅ postdagi title/description obyekt bo‘lsa ham pickLang bilan string qilib olamiz
+  const titleText = useMemo(() => pickLang(post?.title, lang), [post, lang]);
+  const descriptionText = useMemo(() => pickLang(post?.description, lang), [post, lang]);
+
+  // ✅ copy blog uchun ham shu translated textlardan foydalanamiz
   const blogText = useMemo(() => {
     if (!post) return "";
-    return `${post.title}\n\n${post.description}`;
-  }, [post]);
+    return `${titleText}\n\n${descriptionText}`;
+  }, [post, titleText, descriptionText]);
 
+  // blog fetch
   useEffect(() => {
     let cancelled = false;
 
@@ -94,14 +109,14 @@ function BlogDetail() {
     };
   }, [id]);
 
-  // recommendations fetch (after id changes)
+  // recommendations fetch
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
       try {
         setRecLoading(true);
-        const all = await getBlogs(); // array
+        const all = await getBlogs();
         if (cancelled) return;
 
         const filtered = (Array.isArray(all) ? all : []).filter((p) => p?._id !== id);
@@ -119,7 +134,7 @@ function BlogDetail() {
     };
   }, [id]);
 
-  // auto-hide toasts (3s)
+  // auto-hide toasts
   useEffect(() => {
     if (!copiedLink) return;
     const t = setTimeout(() => setCopiedLink(false), 3000);
@@ -167,16 +182,17 @@ function BlogDetail() {
         {/* Image */}
         <div className="w-full h-[320px] rounded-3xl overflow-hidden mb-8 border border-black/10 dark:border-white/10">
           <img
-            src={post.photos?.[0] || FALLBACK_IMG}
-            alt={post.title}
+            src={post?.photos?.[0] || FALLBACK_IMG}
+            alt={titleText}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         </div>
 
         {/* Title + Actions row */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#46494C] dark:text-[#DCDCDD]">
-            {post.title}
+            {titleText}
           </h1>
 
           {/* Copy Buttons */}
@@ -225,57 +241,54 @@ function BlogDetail() {
 
         {/* Description */}
         <p className="mt-6 text-lg leading-relaxed text-[#4C5C68] dark:text-white/70 whitespace-pre-line">
-          {post.description}
+          {descriptionText}
         </p>
 
-        {/* Bottom row: Next blogs + random 3 posts (hidden on mobile) */}
+        {/* Bottom row: random posts + next blogs button */}
         <div className="w-full mt-14 pt-8 border-t border-black/10 dark:border-white/10 flex items-start flex-col gap-8">
-          {/* Left: button */}
-
-          {/* Right: 3 random posts (desktop only) */}
-         
-            <div className="grid grid-cols-2 gap-2 w-full">
-              {(recLoading ? Array.from({ length: 3 }) : randomPosts).map((p, idx) => {
-                if (recLoading) {
-                  return (
-                    <div
-                      key={idx}
-                      className="h-[120px] rounded-2xl bg-black/10 dark:bg-white/10 animate-pulse"
-                    />
-                  );
-                }
-
-                const img = p?.photos?.[0] || FALLBACK_IMG;
-
+          {/* Random 3 posts */}
+          <div className="grid grid-cols-2 gap-2 w-full">
+            {(recLoading ? Array.from({ length: 3 }) : randomPosts).map((p, idx) => {
+              if (recLoading) {
                 return (
-                  <Link
-                    key={p._id}
-                    to={`/blog/${p._id}`}
-                    className="
-                      group rounded-2xl overflow-hidden
-                      border border-black/10 dark:border-white/10
-                      bg-white/60 dark:bg-white/5 backdrop-blur
-                      hover:border-[#1985A1]/40 transition
-                    "
-                    title={p?.title}
-                  >
-                  
-                    <div className="p-3">
-                      <div className="text-sm font-semibold text-[#46494C] dark:text-[#DCDCDD] group-hover:text-[#1985A1] transition-colors line-clamp-1">
-                        {p?.title || "Post"}
-                      </div>
-                      <div className="mt-1 text-xs text-[#4C5C68] dark:text-white/60 line-clamp-1">
-                        {truncateWords(p?.description || "", 6)}
-                      </div>
-                      <div className="mt-2 text-xs font-semibold text-[#1985A1]">
-                        Read more →
-                      </div>
-                    </div>
-                  </Link>
+                  <div
+                    key={idx}
+                    className="h-[120px] rounded-2xl bg-black/10 dark:bg-white/10 animate-pulse"
+                  />
                 );
-              })}
-            </div>
-       
+              }
+
+              const recTitle = pickLang(p?.title, lang);
+              const recDesc = pickLang(p?.description, lang);
+
+              return (
+                <Link
+                  key={p?._id || idx}
+                  to={`/blog/${p?._id}`}
+                  className="
+                    group rounded-2xl overflow-hidden
+                    border border-black/10 dark:border-white/10
+                    bg-white/60 dark:bg-white/5 backdrop-blur
+                    hover:border-[#1985A1]/40 transition
+                  "
+                  title={recTitle}
+                >
+                  <div className="p-3">
+                    <div className="text-sm font-semibold text-[#46494C] dark:text-[#DCDCDD] group-hover:text-[#1985A1] transition-colors line-clamp-1">
+                      {recTitle || "Post"}
+                    </div>
+                    <div className="mt-1 text-xs text-[#4C5C68] dark:text-white/60 line-clamp-1">
+                      {truncateWords(recDesc, 6)}
+                    </div>
+                    <div className="mt-2 text-xs font-semibold text-[#1985A1]">
+                      Read more →
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
           <Link
             to="/blog"
             className="
@@ -289,7 +302,6 @@ function BlogDetail() {
           >
             Keyingi bloglar →
           </Link>
-
         </div>
 
         {/* Toast */}
