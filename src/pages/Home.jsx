@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   FaGithub,
   FaLinkedinIn,
@@ -12,13 +12,14 @@ import "aos/dist/aos.css";
 import { getCvBlob, getMainPage } from "../api/mainPage";
 import Sk from "../components/Sk";
 import { pickLang, getLang } from "../api/mainPage"
+import { useNavigate } from "react-router-dom";
 
 
 function Home() {
   const [profile, setProfile] = useState(null);
   const [cvUrl, setCvUrl] = useState("");
   const [loading, setLoading] = useState(true);
-
+const navigate = useNavigate();
   const lang = useMemo(() => getLang(), []);
 
   useEffect(() => {
@@ -77,6 +78,20 @@ function Home() {
   const professionAddText = useMemo(() => pickLang(profile?.profession_add, lang), [profile, lang]);
   const professionText = useMemo(() => pickLang(profile?.profession, lang), [profile, lang]);
 
+
+
+  const clickCount = useRef(0);
+
+  const handleClick = () => {
+    clickCount.current += 1;
+
+    if (clickCount.current === 10) {
+ navigate("/admin");  
+ 
+      clickCount.current = 0; 
+    }
+  };
+
   return (
     <section
       id="home"
@@ -105,7 +120,7 @@ function Home() {
               <div className="relative w-64 h-64 sm:w-80 sm:h-80 flex items-center justify-center">
                 <div className="absolute -inset-6 rounded-full blur-3xl opacity-30 bg-[#1985A1] hidden dark:block" />
 
-                <div className="relative w-full h-full rounded-full overflow-hidden border border-black/10 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur">
+                <div  onClick={handleClick} className="relative w-full h-full rounded-full overflow-hidden border border-black/10 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur">
                   {loading ? (
                     <Sk className="w-full h-full rounded-full" />
                   ) : profile?.photos?.[0] ? (
