@@ -240,9 +240,20 @@ function BlogDetail() {
         </div>
 
         {/* Description */}
-        <p className="mt-6 text-lg leading-relaxed text-[#4C5C68] dark:text-white/70 whitespace-pre-line">
-          {descriptionText}
-        </p>
+   {/* Description (Quill HTML) */}
+   <div className="mt-6">
+  <div
+    className="
+      ql-editor
+      bg-transparent
+      text-[#4C5C68] dark:text-white/80
+      leading-relaxed
+    "
+    dangerouslySetInnerHTML={{
+      __html: String(descriptionText || ""),
+    }}
+  />
+</div>
 
         {/* Bottom row: random posts + next blogs button */}
         <div className="w-full mt-14 pt-8 border-t border-black/10 dark:border-white/10 flex items-start flex-col gap-8">

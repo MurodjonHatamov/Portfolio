@@ -10,6 +10,7 @@ import Blog from "../pages/admin/Blog";
 import Contact from "../pages/admin/Contact";
 import Achievements from "../pages/admin/Achievements";
 import Profile from "../pages/admin/Profile";
+import AddBlog from "../pages/admin/AddBlog";
 
 function AdminRoutes() {
   return (
@@ -25,6 +26,8 @@ function AdminRoutes() {
         <Route path="profile" element={<Profile/>} />
         <Route path="experience" element={<Experience />} />
         <Route path="blog" element={<Blog />} />
+        <Route path="/blog/add" element={<AddBlog />} />
+
         <Route path="messages" element={<Contact />} />
         <Route path="achievements" element={<Achievements />} />
       </Route>

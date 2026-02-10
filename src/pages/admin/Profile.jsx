@@ -176,7 +176,7 @@ export default function Profile() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
-              Profile (Mainpage)
+              Profile
             </h1>
           
           </div>
@@ -253,9 +253,7 @@ export default function Profile() {
                   <h2 className="text-lg font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
                     Preview
                   </h2>
-                  <p className="text-xs text-[#4C5C68] dark:text-white/60 mt-1">
-                    Hozirgi profil ko‘rinishi
-                  </p>
+              
                 </div>
 
                 {profile?.cv ? (
@@ -302,9 +300,7 @@ export default function Profile() {
               <h2 className="text-lg font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
                 Edit profile
               </h2>
-              <p className="text-xs text-[#4C5C68] dark:text-white/60 mt-1">
-                Profession va profession_add JSON string bo‘lib ketadi. Skills/Tools vergul bilan.
-              </p>
+          
 
               <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
