@@ -13,7 +13,7 @@ import Achievements from "./pages/Achievements";
 import BottomNavigator from "./components/BottomNavigator";
 import AdminRoutes from "./router/AdminRoutes";
 import Sidebar from "./components/admin/Sidebar";
-import "quill/dist/quill.snow.css";
+
 
 function AppInner() {
   const [profile, setProfile] = useState(null);
