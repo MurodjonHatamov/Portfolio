@@ -3,12 +3,16 @@ import { FaBriefcase, FaCalendarAlt } from "react-icons/fa";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { getExperience } from "../api/apis";
-import { getLang, pickLang } from "../api/mainPage";
+import { useLang } from "../context/LanguageContext";
+import { pickLang } from "../api/mainPage";
+import Sk from "../components/Sk";
+
 
 function Experience() {
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { lang, t } = useLang();
 
   useEffect(() => {
     AOS.init({ duration: 900, once: true, easing: "ease-out-cubic", offset: 60 });
@@ -50,13 +54,10 @@ function Experience() {
   }, []);
 
 
-  const lang=useMemo(()=>getLang(),[])
+
 
 
   // ✅ skeleton helper
-  const Sk = ({ className = "" }) => (
-    <div className={`bg-black/10 dark:bg-white/10 animate-pulse ${className}`} />
-  );
 
   // ✅ skeleton cards soni
   const skeletonItems = useMemo(() => Array.from({ length: 4 }), []);
@@ -73,7 +74,7 @@ function Experience() {
         {/* Header */}
         <div className="text-center mb-16" data-aos="fade-down">
           <h2 className="text-4xl md:text-5xl font-bold text-[#46494C] dark:text-[#DCDCDD] mb-4">
-            My <span className="text-[#1985A1]">Journey</span>
+           {t("title_my")} <span className="text-[#1985A1]">{t("exp_title_journey")}</span>
           </h2>
 
           {/* loading subtitle skeleton (xohlasang) */}
@@ -145,8 +146,8 @@ function Experience() {
             experiences.map((exp, index) => {
               const isEven = index % 2 === 0;
               
-  const descriptionText = pickLang(exp?.description, lang);
-  const roleText = pickLang(exp?.role, lang);
+              const descriptionText = pickLang(exp?.description, lang);
+              const roleText = pickLang(exp?.role, lang);
   // const companyText = pickLang(exp?.company, lang);
 
               return (

@@ -3,6 +3,8 @@ import { FaRegSun } from "react-icons/fa";
 import { MdOutlineDarkMode } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
 import Sk from "./Sk";
+import CustomSelect from "./CustomSelect";
+import { useLang } from "../context/LanguageContext";
 
 function Navbar({ profile }) {
   // ===== THEME =====
@@ -21,59 +23,17 @@ function Navbar({ profile }) {
 
   const dark = theme === "dark";
 
-  // ===== LANGUAGE =====
-  const getInitialLang = () => {
-    const saved = localStorage.getItem("lang");
-    if (saved === "uz" || saved === "en" || saved === "ru") return saved;
-    return "uz";
-  };
-
-  const [lang, setLang] = useState(getInitialLang);
-
-  useEffect(() => {
-    localStorage.setItem("lang", lang);
-    // xohlasang html lang ham qo'yamiz
-    document.documentElement.lang = lang;
-  }, [lang]);
-
-  const t = useMemo(() => {
-    const dict = {
-      uz: {
-        home: "Bosh sahifa",
-        projects: "Loyihalar",
-        experience: "Tajriba",
-        achievements: "Yutuqlar",
-        blog: "Blog",
-        contact: "Aloqa",
-      },
-      en: {
-        home: "Home",
-        projects: "Projects",
-        experience: "Experience",
-        achievements: "Achievements",
-        blog: "Blog",
-        contact: "Contact",
-      },
-      ru: {
-        home: "Главная",
-        projects: "Проекты",
-        experience: "Опыт",
-        achievements: "Достижения",
-        blog: "Блог",
-        contact: "Контакты",
-      },
-    };
-    return dict[lang];
-  }, [lang]);
+  // ✅ LANGUAGE (Context'dan olamiz)
+  const { lang, setLang, t } = useLang();
 
   const menu = useMemo(
     () => [
-      { key: "home", to: "/", label: t.home },
-      { key: "projects", to: "/projects", label: t.projects },
-      { key: "experience", to: "/experience", label: t.experience },
-      { key: "achievements", to: "/achievements", label: t.achievements },
-      { key: "blog", to: "/blog", label: t.blog },
-      { key: "contact", to: "/contact", label: t.contact },
+      { to: "/", label: t("nav_home") },
+      { to: "/projects", label: t("nav_projects") },
+      { to: "/experience", label: t("nav_experience") },
+      { to: "/achievements", label: t("nav_achievements") },
+      { to: "/blog", label: t("nav_blog") },
+      { to: "/contact", label: t("nav_contact") },
     ],
     [t]
   );
@@ -106,17 +66,17 @@ function Navbar({ profile }) {
                      text-[#46494C] dark:text-[#DCDCDD]"
         >
           {menu.map((item) => (
-            <li key={item.key} className="relative group max-lg:hidden">
+            <li key={item.to} className="relative group max-lg:hidden">
               <NavLink
                 to={item.to}
+                aria-label={item.label}
+                title={item.label}
                 className={({ isActive }) =>
                   `relative text-[18px] transition-colors duration-300
                    ${isActive ? "text-[#1985A1]" : "hover:text-[#1985A1]"}`
                 }
               >
                 {item.label}
-
-                {/* underline */}
                 <span
                   className="
                     absolute left-0 -bottom-1 h-[2px] bg-[#1985A1]
@@ -128,60 +88,39 @@ function Navbar({ profile }) {
             </li>
           ))}
 
-          {/* Language selector */}
+          {/* Language + DarkMode */}
           <div className="ml-2 flex items-center">
-            <div
+            <CustomSelect
+              value={lang}
+              onChange={setLang}   // ✅ reload yo'q
+              options={[
+                { value: "uz", label: "UZ" },
+                { value: "en", label: "EN" },
+                { value: "ru", label: "RU" },
+              ]}
+              widthClass="w-24"
+            />
+
+            <button
+              onClick={() => setTheme(dark ? "light" : "dark")}
               className="
+                ml-3 cursor-pointer
                 bg-white/45 dark:bg-white/10
                 border border-black/10 dark:border-white/10
-                rounded-xl px-2 py-1
+                p-2 rounded-xl
                 backdrop-blur
+                hover:scale-105 transition
+                active:scale-90
               "
+              aria-label="Toggle theme"
             >
-              <select
-                value={lang}
-                onChange={(e) => {
-                  const newLang = e.target.value;
-                  localStorage.setItem("lang", newLang);
-              
-                  // sahifani yangilaymiz
-                  window.location.reload();
-                }}
-                className="
-                  bg-transparent outline-none
-                  text-[14px] font-semibold
-                  text-[#46494C] dark:text-[#DCDCDD]
-                  cursor-pointer
-                "
-                aria-label="Select language"
-              >
-                <option value="uz">UZ</option>
-                <option value="en">EN</option>
-                <option value="ru">RU</option>
-              </select>
-            </div>
+              {dark ? (
+                <FaRegSun className="text-[22px] text-[#1985A1]" />
+              ) : (
+                <MdOutlineDarkMode className="text-[22px] text-[#46494C] dark:text-[#DCDCDD]" />
+              )}
+            </button>
           </div>
-
-          {/* Dark mode toggle */}
-          <button
-            onClick={() => setTheme(dark ? "light" : "dark")}
-            className="
-              ml-3 cursor-pointer
-              bg-white/45 dark:bg-white/10
-              border border-black/10 dark:border-white/10
-              p-2 rounded-xl
-              backdrop-blur
-              hover:scale-105 transition
-              active:scale-90
-            "
-            aria-label="Toggle theme"
-          >
-            {dark ? (
-              <FaRegSun className="text-[22px] text-[#1985A1]" />
-            ) : (
-              <MdOutlineDarkMode className="text-[22px] text-[#46494C] dark:text-[#DCDCDD]" />
-            )}
-          </button>
         </ul>
       </div>
     </nav>

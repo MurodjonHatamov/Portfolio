@@ -4,7 +4,8 @@ import "aos/dist/aos.css";
 import ModalProject from "../components/ModalProject";
 import { getProjects } from "../api/apis";
 import Sk from "../components/Sk";
-import { getLang, pickLang } from "../api/mainPage";
+import { pickLang } from "../api/mainPage";
+import { useLang } from "../context/LanguageContext";
 
 function Projects({ profile }) {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -12,10 +13,8 @@ function Projects({ profile }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-const lang = useMemo(() => getLang(), []);
+const {lang,t}=useLang()
   
-const descriptionText = useMemo(() => pickLang(selectedProject?.description, lang), [lang, selectedProject]);
-console.log(descriptionText);
 
 
 
@@ -47,7 +46,7 @@ console.log(descriptionText);
         setProjects(Array.isArray(data) ? data : []);
       } catch (e) {
         if (cancelled) return;
-        setError(e?.message || "Xatolik yuz berdi");
+        setError(e?.message || t("error_default"));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -61,6 +60,8 @@ console.log(descriptionText);
   // ✅ Skeleton cards soni (xohlasang 4/6/8)
   const skeletonCards = useMemo(() => Array.from({ length: 2 }), []);
 
+
+
   return (
     <section id="projects" className="min-h-screen py-20 relative overflow-hidden">
       <div className="container mx-auto max-w-7xl mx-auto px-6 relative z-10">
@@ -70,7 +71,7 @@ console.log(descriptionText);
             data-aos="fade-down"
             className="text-4xl max-sm:text-[25px] md:text-5xl font-bold text-[#46494C] dark:text-[#DCDCDD]"
           >
-            My <span className="text-[#1985A1]">Projects</span>
+  {t("title_my")} <span className="text-[#1985A1]">{t("projects_title_projects")}</span>
           </h2>
 
           <div data-aos="fade-up">
@@ -80,7 +81,8 @@ console.log(descriptionText);
               rel="noreferrer"
               className="px-8 py-3 rounded-full border border-[#1985A1] text-[#1985A1] font-semibold max-sm:text-[12px] hover:bg-[#1985A1] hover:text-white transition-all duration-300"
             >
-              View All Archives
+        {t("projects_view_archives")}
+
             </a>
           </div>
         </div>
@@ -153,7 +155,8 @@ console.log(descriptionText);
 
                     <div className="flex items-center gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
                       <span className="text-white/80 text-sm font-medium border-b border-[#1985A1]">
-                        Click to view details
+                      {t("projects_click_details")}
+
                       </span>
                     </div>
                   </div>
@@ -169,7 +172,7 @@ console.log(descriptionText);
           FALLBACK_IMG={FALLBACK_IMG}
           setSelectedProject={setSelectedProject}
           selectedProject={selectedProject}
-          descriptionText={descriptionText}
+       
         />
       )}
     </section>

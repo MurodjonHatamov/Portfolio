@@ -187,14 +187,14 @@ function BlogDetail() {
     <section className="min-h-screen px-4 pt-24 pb-20">
       <div className="max-w-4xl mx-auto">
         {/* Image */}
-        <div className="w-full h-[320px] rounded-3xl overflow-hidden mb-8 border border-black/10 dark:border-white/10">
-          <img
-            src={post?.photos?.[0] || FALLBACK_IMG}
-            alt={titleText}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
+        <div className="w-full aspect-[16/9] rounded-3xl overflow-hidden mb-8 border border-black/10 dark:border-white/10">
+  <img
+    src={post?.photos?.[0] || FALLBACK_IMG}
+    alt={titleText}
+    className="w-full h-full object-contain"
+    loading="lazy"
+  />
+</div>
 
         {/* Title + Actions row */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">

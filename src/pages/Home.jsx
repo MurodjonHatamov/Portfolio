@@ -13,6 +13,7 @@ import { getCvBlob, getMainPage } from "../api/mainPage";
 import Sk from "../components/Sk";
 import { pickLang, getLang } from "../api/mainPage"
 import { useNavigate } from "react-router-dom";
+import { useLang } from "../context/LanguageContext";
 
 
 function Home() {
@@ -20,8 +21,9 @@ function Home() {
   const [cvUrl, setCvUrl] = useState("");
   const [loading, setLoading] = useState(true);
 const navigate = useNavigate();
-  const lang = useMemo(() => getLang(), []);
 
+  const { lang, t } = useLang();
+  
   useEffect(() => {
     let urlToClean = "";
 
@@ -75,8 +77,15 @@ const navigate = useNavigate();
   }, [profile]);
 
   
-  const professionAddText = useMemo(() => pickLang(profile?.profession_add, lang), [profile, lang]);
-  const professionText = useMemo(() => pickLang(profile?.profession, lang), [profile, lang]);
+  const professionAddText = useMemo(
+    () => pickLang(profile?.profession_add, lang),
+    [profile, lang]
+  );
+  
+  const professionText = useMemo(
+    () => pickLang(profile?.profession, lang),
+    [profile, lang]
+  );
 
 
 
@@ -177,10 +186,10 @@ const navigate = useNavigate();
                 </div>
               ) : (
                 <div data-aos="fade-up" className="space-y-2">
-                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]">
-                    Hi, I&apos;m{" "}
+                  <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]">
+                  {t("home_hi")}{" "}
                     <span className="text-[#1985A1]">
-                      {profile?.full_name || "Developer"}
+                    {profile?.full_name || t("home_dev")}
                     </span>
                   </h1>
 
@@ -219,7 +228,7 @@ const navigate = useNavigate();
                 >
                   <RiMapPinLine className="text-[20px] text-[#1985A1]" />
                   <span className="text-lg font-medium text-[#46494C] dark:text-[#DCDCDD]">
-                    {profile?.address || "Uzbekistan"}
+                    {profile?.address ||  t("home_location")}
                   </span>
                 </div>
               )}
@@ -244,14 +253,15 @@ const navigate = useNavigate();
                       `}
                     >
                       <FiDownload className="text-[20px]" />
-                      <span>Download CV</span>
+                      <span>{t("home_download_cv")}</span>
                     </a>
 
                     <a
-                      href="/blog"
+                      href="/projects"
                       className="group flex items-center gap-2 px-6 py-3 rounded-xl font-semibold dark:bg-[#4C5C68]/40 border border-[#4C5C68]/30 dark:border-[#C5C3C6]/20 text-[#46494C] dark:text-[#DCDCDD] active:scale-95 transition-all duration-300 hover:bg-[#4C5C68]/10"
                     >
-                      <span>Read Blog</span>
+                    <span>{t("home_my_projects")}</span>
+
                     </a>
                   </>
                 )}
@@ -276,7 +286,7 @@ const navigate = useNavigate();
             ) : (
               <>
                 <span className="text-2xl font-semibold text-[#1985A1] md:mr-2">
-                  Skills
+                {t("home_skills")}
                 </span>
                 <div className="flex flex-wrap justify-center md:justify-end items-center gap-2">
                   {(profile?.skills || []).map((item, i, arr) => (
@@ -309,7 +319,7 @@ const navigate = useNavigate();
             ) : (
               <>
                 <span className="text-2xl font-semibold text-[#1985A1] md:ml-2">
-                  Tools
+                {t("home_tools")}
                 </span>
                 <div className="flex flex-wrap justify-center md:justify-start items-center gap-2">
                   {(profile?.tools || []).map((item, i, arr) => (

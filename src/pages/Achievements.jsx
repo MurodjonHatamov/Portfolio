@@ -3,7 +3,8 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { FaExternalLinkAlt, FaCalendarAlt } from "react-icons/fa";
 import { getAchievements } from "../api/apis";
-import { getLang, pickLang } from "../api/mainPage";
+import { useLang } from "../context/LanguageContext";
+import { pickLang } from "../api/mainPage";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop";
@@ -19,7 +20,7 @@ function formatDate(date) {
 function Achievements() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const { lang, t } = useLang();
   useEffect(() => {
     AOS.init({ duration: 900, once: true, easing: "ease-out-cubic" });
   }, []);
@@ -44,8 +45,6 @@ function Achievements() {
 
 
 
-  const lang =useMemo(()=>getLang(),[])
-
   
   return (
     <section
@@ -56,11 +55,11 @@ function Achievements() {
         {/* Header */}
         <div className="text-center mb-16" data-aos="fade-down">
           <h2 className="text-4xl md:text-5xl font-bold text-[#46494C] dark:text-[#DCDCDD]">
-            Achievements & <span className="text-[#1985A1]">Certificates</span>
+          {t("ach_title_achievements")} &{" "}
+<span className="text-[#1985A1]">{t("ach_title_certificates")}</span>
+
           </h2>
-          <p className="mt-3 text-[#4C5C68] dark:text-white/60">
-            O‘rganilgan bilimlar va rasmiy sertifikatlar
-          </p>
+      
         </div>
 
         {/* GRID */}
@@ -78,8 +77,8 @@ function Achievements() {
           {!loading &&
             data.map((item, index) => {
       
-              const descriptionText=pickLang(item.description,lang)
-              const nameText=pickLang(item.name,lang)
+              const descriptionText = pickLang(item.description, lang);
+              const nameText = pickLang(item.name, lang);
               return (
                 <a
                 key={item._id}
@@ -131,7 +130,7 @@ function Achievements() {
 
                   {/* LINK */}
                   <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-[#1985A1] opacity-0 group-hover:opacity-100 transition">
-                    View certificate <FaExternalLinkAlt />
+                  {t("ach_view_certificate")} <FaExternalLinkAlt />
                   </div>
                 </div>
               </a>

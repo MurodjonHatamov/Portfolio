@@ -2,15 +2,16 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBlogs } from "../api/apis";
 import { FaCalendarAlt, FaEye } from "react-icons/fa";
-import { getLang, pickLang } from "../api/mainPage";
+import { useLang } from "../context/LanguageContext";
+import { pickLang } from "../api/mainPage";
 
 function Blog() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const { lang, t } = useLang();
 
-const lang =useMemo (()=>getLang(),[])
 
   useEffect(() => {
     let alive = true;
@@ -24,7 +25,7 @@ const lang =useMemo (()=>getLang(),[])
         setPosts(Array.isArray(data) ? data : []);
       } catch (e) {
         if (!alive) return;
-        setErr(e?.message || "Xatolik yuz berdi");
+        setErr(e?.message || t("error_default"));
       } finally {
         if (alive) setLoading(false);
       }
@@ -68,11 +69,9 @@ const lang =useMemo (()=>getLang(),[])
         {/* Header */}
         <div className="mb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-[#46494C] dark:text-[#DCDCDD]">
-            Blog
+          {t("blog_title")}
           </h1>
-          <p className="mt-3 text-[#4C5C68] dark:text-white/60">
-            Fikrlar, tajriba va frontend bo‘yicha yozuvlarim.
-          </p>
+      
         </div>
 
         {/* Error */}
@@ -138,7 +137,7 @@ const lang =useMemo (()=>getLang(),[])
   />
                 <div className="flex items-center justify-between">
                   <span className="text-[#1985A1] font-semibold block mt-1">
-                    Read more →
+                  {t("blog_read_more")}  →
                   </span>
 
                   <div className="flex items-center gap-2">
@@ -157,9 +156,9 @@ const lang =useMemo (()=>getLang(),[])
           </div>
         )}
 
-        <div className="mt-16 text-center text-sm text-[#4C5C68] dark:text-white/40">
+        {/* <div className="mt-16 text-center text-sm text-[#4C5C68] dark:text-white/40">
           Yangi postlar tez orada ✍️
-        </div>
+        </div> */}
       </div>
     </section>
   );

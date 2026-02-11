@@ -65,14 +65,14 @@ export async function getBlogs() {
   return res.json(); // array
 }
 
-export async function getBlogById(id) {
-  const res = await fetch(`${BASE_URL}/blog/${id}`, {
-    method: "GET",
-    headers: { accept: "*/*" },
-  });
-  if (!res.ok) throw new Error("Blogni olishda xatolik");
-  return res.json(); // object
-}
+  export async function getBlogById(id) {
+    const res = await fetch(`${BASE_URL}/blog/${id}`, {
+      method: "GET",
+      headers: { accept: "*/*" },
+    });
+    if (!res.ok) throw new Error("Blogni olishda xatolik");
+    return res.json(); // object
+  }
 
 // Bu api yutuqlar (achievements) bo'limi uchun mo'ljallangan bo'lib, yutuqlar ro'yxatini olish uchun ishlatiladi.
 export async function getAchievements() {
