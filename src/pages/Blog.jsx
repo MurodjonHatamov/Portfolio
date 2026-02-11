@@ -125,10 +125,17 @@ const lang =useMemo (()=>getLang(),[])
                   {previewWords(post.title, 8)}
                 </h2>
 
-                <p className="mt-3 line-clamp-1 text-[#4C5C68] dark:text-white/65 leading-relaxed">
-                  {previewWords(post.description, 12)}
-                </p>
-
+                <div
+    className="
+      ql-editor
+      bg-transparent
+      text-[#4C5C68] dark:text-white/80
+      leading-relaxed
+    "
+    dangerouslySetInnerHTML={{
+      __html: previewWords(post.description, 12) || "",
+    }}
+  />
                 <div className="flex items-center justify-between">
                   <span className="text-[#1985A1] font-semibold block mt-1">
                     Read more →
