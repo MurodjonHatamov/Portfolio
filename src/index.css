@@ -2,11 +2,12 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
 body {
   background-color: #ffffffd9; /* bg-gray-900 */
   color: white;
 font-family: var(--font-inter);
+
 }
 
 
@@ -15,4 +16,57 @@ font-family: var(--font-inter);
 
 }
 
+/* umumiy konteyner */
+.ql-code-block-container{
+  position: relative;
+  background: #0f172a;
+  font-family: "Google Sans Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  border-radius: 14px;
+  font-size: 14px;
+  color: #e5e7eb;
+  padding: 18px 16px 16px 16px;
+  margin: 18px 0;
+  overflow-x: auto;
+  line-height: 1.7;
+  border: 1px solid rgba(255,255,255,0.08);
+  user-select: all;
+}
 
+/* dark theme */
+[data-theme="dark"] .ql-code-block-container{
+  background: #1e212ee5;
+  color: #f1f5f9;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.ql-code-block{
+  white-space: pre;
+  padding-left: 6px;
+}
+
+/* satrlar orasidagi masofa */
+.ql-code-block + .ql-code-block{
+  margin-top: 2px;
+}
+.ql-code-block-container::before{
+  content: "CODE";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 32px;
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px 14px 0 0;
+  display: flex;
+  align-items: center;
+  padding-left: 14px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  color: #9ca3af;
+}
+
+/* ichki padding header uchun */
+.ql-code-block-container{
+  padding-top: 44px;
+}

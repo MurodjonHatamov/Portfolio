@@ -167,6 +167,11 @@ function BlogDetail() {
     }
   };
 
+
+
+
+  
+
   if (loading) return <BlogDetailSkeleton />;
 
   if (!post)
@@ -191,7 +196,7 @@ function BlogDetail() {
 
         {/* Title + Actions row */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#46494C] dark:text-[#DCDCDD]">
+          <h1 className="select-all text-3xl sm:text-2xl font-bold text-[#46494C] dark:text-[#DCDCDD]">
             {titleText}
           </h1>
 
