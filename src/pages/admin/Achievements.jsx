@@ -323,9 +323,7 @@ export default function Achievements() {
                           <div className="font-extrabold text-[#46494C] dark:text-[#DCDCDD]">
                             {nameText || "—"}
                           </div>
-                          <div className="text-xs text-[#4C5C68] dark:text-white/60">
-                            ID: {a?._id}
-                          </div>
+                        
                         </td>
 
                         <td className="py-3 px-4 text-[#4C5C68] dark:text-white/70">
