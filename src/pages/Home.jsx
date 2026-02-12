@@ -185,19 +185,27 @@ const navigate = useNavigate();
                   <Sk className="h-10 sm:h-12 w-56 sm:w-72 rounded-2xl mx-auto lg:mx-0" />
                 </div>
               ) : (
-                <div data-aos="fade-up" className="space-y-2">
-                  <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]">
-                  {t("home_hi")}{" "}
-                    <span className="text-[#1985A1]">
-                    {profile?.full_name || t("home_dev")}
-                    </span>
-                  </h1>
-
-                  {/* profession (til bo'yicha) */}
-                  <p className="text-lg sm:text-xl font-semibold text-[#4C5C68] dark:text-white/70">
-                    {professionText}
-                  </p>
-                </div>
+                <div data-aos="fade-up" className="space-y-4">
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]">
+                  {t("home_hi")} <span className="text-[#1985A1]">{profile?.full_name || t("home_dev")}</span>
+                </h1>
+              
+                <div className="w-14 h-[3px] rounded-full bg-[#1985A1] opacity-80 mx-auto lg:mx-0" />
+              
+                <p
+                  className="
+                    text-[15px] sm:text-[19px]
+                    font-semibold
+                    text-[#4C5C68] dark:text-white/70
+                    leading-relaxed
+                    max-w-xl
+                    mx-auto lg:mx-0
+                  "
+                >
+                  {professionText}
+                </p>
+              </div>
+              
               )}
 
               {/* PROFESSION ADD (til bo'yicha) */}

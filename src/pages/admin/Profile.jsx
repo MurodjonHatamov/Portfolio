@@ -36,6 +36,7 @@ export default function Profile() {
     github: "",
     telegram: "",
     linkedin: "",
+    instagram: "",
 
     profession_uz: "",
     profession_ru: "",
@@ -75,6 +76,8 @@ export default function Profile() {
           github: one?.github || "",
           telegram: one?.telegram || "",
           linkedin: one?.linkedin || "",
+          instagram: one?.instagram || "",
+
 
           profession_uz: typeof prof === "object" ? (prof?.uz || "") : String(prof || ""),
           profession_ru: typeof prof === "object" ? (prof?.ru || "") : "",
@@ -125,6 +128,8 @@ export default function Profile() {
       if (form.github?.trim()) fd.append("github", form.github.trim());
       if (form.telegram?.trim()) fd.append("telegram", form.telegram.trim());
       if (form.linkedin?.trim()) fd.append("linkedin", form.linkedin.trim());
+      if (form.instagram?.trim()) fd.append("instagram", form.instagram.trim());
+
 
       // JSON string fields
       fd.append(
@@ -333,6 +338,14 @@ export default function Profile() {
                   onChange={(e) => setForm((s) => ({ ...s, linkedin: e.target.value }))}
                   placeholder="https://..."
                 />
+                <Input
+                  label="Instagram"
+                  value={form.instagram}
+                  onChange={(e) => setForm((s) => ({ ...s, instagram: e
+.target.value }))}
+                  placeholder="https://..."
+                />
+
 
                 <div className="md:col-span-2">
                   <Input
