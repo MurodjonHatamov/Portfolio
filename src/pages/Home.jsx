@@ -107,18 +107,30 @@ const navigate = useNavigate();
       className="pb-[100px] lg:pb-0 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-16 relative overflow-hidden"
     >
       {/* Background Accents */}
-      <div className="absolute inset-0 -z-10 overflow-hidden hidden dark:flex">
+         {/* ✅ LIGHT + DARK background accents (sayt feel) */}
+         <div className="absolute inset-0 -z-10">
+        {/* light mode gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-[#DCDCDD]/40 dark:from-[#0a0a0a] dark:via-[#0a0a0a] dark:to-black" />
+
+        {/* soft blobs (light) */}
+        <div className="absolute -top-32 -left-32 w-[32rem] h-[32rem] rounded-full blur-3xl opacity-35 bg-[#1985A1]/20 dark:hidden" />
+        <div className="absolute -bottom-40 -right-40 w-[36rem] h-[36rem] rounded-full blur-3xl opacity-30 bg-[#4C5C68]/20 dark:hidden" />
+
+        {/* soft blobs (dark) */}
+        <div className="absolute top-20 -left-24 w-[28rem] h-[28rem] rounded-full blur-3xl opacity-10 bg-[#1985A1] hidden dark:block" />
+        <div className="absolute -bottom-28 -right-24 w-[34rem] h-[34rem] rounded-full blur-3xl opacity-10 bg-[#1985A1] hidden dark:block" />
+
+        {/* tiny noise grid feel */}
         <div
-          data-aos="fade-right"
-          data-aos-delay="100"
-          className="absolute top-20 -left-24 w-[28rem] h-[28rem] rounded-full blur-3xl opacity-5 bg-[#1986a164]"
-        />
-        <div
-          data-aos="fade-left"
-          data-aos-delay="180"
-          className="absolute -bottom-28 -right-24 w-[34rem] h-[34rem] rounded-full blur-3xl opacity-5 bg-[#1986a13d]"
+          className="absolute inset-0 opacity-[0.05] dark:opacity-[0.08]"
+          style={{
+            backgroundImage:
+              "radial-gradient(#46494C 1px, transparent 1px)",
+            backgroundSize: "18px 18px",
+          }}
         />
       </div>
+
 
       <div className="container mx-auto max-w-7xl relative">
         {/* MAIN */}
@@ -186,17 +198,22 @@ const navigate = useNavigate();
                 </div>
               ) : (
                 <div data-aos="fade-up" className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]">
-                  {t("home_hi")} <span className="text-[#1985A1]">{profile?.full_name || t("home_dev")}</span>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#46494C] dark:text-[#DCDCDD]">
+                  {t("home_hi")}{" "}
+                  <span className="text-[#1985A1]">
+                    {profile?.full_name || t("home_dev")}
+                  </span>
                 </h1>
               
                 <div className="w-14 h-[3px] rounded-full bg-[#1985A1] opacity-80 mx-auto lg:mx-0" />
               
+                {/* ✅ KASB: sal kattaroq + rang boshqacha + weight boshqacha */}
                 <p
                   className="
-                    text-[15px] sm:text-[19px]
-                    font-semibold
-                    text-[#4C5C68] dark:text-white/70
+                    text-[17px] sm:text-[20px] lg:text-[22px]
+                    font-medium
+                    tracking-wide
+                    text-[#1985A1]/95 dark:text-[#1985A1]
                     leading-relaxed
                     max-w-xl
                     mx-auto lg:mx-0
@@ -205,6 +222,7 @@ const navigate = useNavigate();
                   {professionText}
                 </p>
               </div>
+              
               
               )}
 
@@ -219,7 +237,7 @@ const navigate = useNavigate();
                 <p
                   data-aos="fade-up"
                   data-aos-delay="120"
-                  className="text-[18px] sm:text-[20px] lg:text-[22px] leading-relaxed text-[#4C5C68] dark:text-white/70 max-w-xl"
+                  className="text-[18px] sm:text-[20px] lg:text-[17px] leading-relaxed text-[#4C5C68] dark:text-white/70 max-w-xl"
                 >
                   {professionAddText}
                 </p>
