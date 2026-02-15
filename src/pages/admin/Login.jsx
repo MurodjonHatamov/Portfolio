@@ -69,9 +69,7 @@ function Login() {
           <h1 className="text-3xl font-bold text-[#46494C] dark:text-[#DCDCDD]">
             Admin Login
           </h1>
-          <p className="text-[#4C5C68] dark:text-white/60 mt-2 text-sm">
-            Portfolio boshqaruv paneli
-          </p>
+
         </div>
 
         {error && (
@@ -134,6 +132,8 @@ function Login() {
                 text-[#4C5C68] dark:text-white/60
                 hover:text-[#1985A1] hover:border-[#1985A1]/40
                 active:scale-95 transition
+                flex items-center justify-center
+                cursor-pointer
               "
               aria-label="Show password"
               title={showPass ? "Hide" : "Show"}
