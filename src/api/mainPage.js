@@ -1,4 +1,4 @@
-export const BASE_URL = "https://portback.hurshidbe.uz";
+export const BASE_URL = "https://mb.hurshidbe.uz";
 
 export async function request(rest) {
   const res = await fetch(`${BASE_URL}${rest}`, {
