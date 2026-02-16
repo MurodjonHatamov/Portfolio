@@ -1,6 +1,6 @@
 import { PiUserCheckDuotone } from "react-icons/pi";
 
-export const BASE_URL = "http://localhost:7700";
+export const BASE_URL = "https://mb.hurshidbe.uz";
 
 
 

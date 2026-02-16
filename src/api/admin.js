@@ -4,7 +4,7 @@
  * ✅ Koding o‘zgarmadi: faqat tartib/bo‘limlar/izohlar chiroyli qilindi.
  */
 
-const BASE_URL = "http://localhost:7700";
+const BASE_URL = "https://mb.hurshidbe.uz";
 
 /* =========================================================
    AUTH (LOGIN)
